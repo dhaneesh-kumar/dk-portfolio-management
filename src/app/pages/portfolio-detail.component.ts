@@ -4,6 +4,7 @@ import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { PortfolioService } from '../services/portfolio.service';
 import { Portfolio, Stock } from '../models/portfolio.model';
+import { PortfolioChartComponent } from '../components/portfolio-chart.component';
 
 @Component({
   selector: 'app-portfolio-detail',
