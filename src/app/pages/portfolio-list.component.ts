@@ -28,31 +28,72 @@ import { SharePortfolioComponent } from "../components/share-portfolio.component
       <div class="bg-white border-b border-slate-200 py-4">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div class="flex items-center justify-between">
-            <div>
-              <h2 class="text-2xl font-bold text-slate-900">My Portfolios</h2>
-              <p class="text-slate-600 mt-1">
-                Manage your investment portfolios
-              </p>
+            <div class="flex-1">
+              <div class="flex items-center gap-4">
+                <div>
+                  <h2 class="text-2xl font-bold text-slate-900">My Portfolios</h2>
+                  <div class="flex items-center gap-4 mt-1">
+                    <p class="text-slate-600">
+                      Manage your investment portfolios
+                    </p>
+                    <div class="flex items-center gap-2">
+                      <div
+                        class="w-2 h-2 rounded-full"
+                        [class]="marketStatus().isOpen ? 'bg-green-500' : 'bg-red-500'"
+                      ></div>
+                      <span class="text-sm text-slate-600">{{ marketStatus().message }}</span>
+                    </div>
+                  </div>
+                </div>
+                @if (lastRefresh()) {
+                  <div class="text-xs text-slate-500 ml-4">
+                    Last updated: {{ lastRefresh()! | date:'short' }}
+                  </div>
+                }
+              </div>
             </div>
-            <button
-              (click)="showCreateModal.set(true)"
-              class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200"
-            >
-              <svg
-                class="w-5 h-5 inline-block mr-2"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
+            <div class="flex items-center gap-3">
+              <button
+                (click)="refreshAllData()"
+                [disabled]="isRefreshing()"
+                class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                />
-              </svg>
-              Create Portfolio
-            </button>
+                <svg
+                  class="w-4 h-4 inline-block mr-2"
+                  [class]="isRefreshing() ? 'animate-spin' : ''"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  />
+                </svg>
+                {{ isRefreshing() ? 'Refreshing...' : 'Refresh Data' }}
+              </button>
+              <button
+                (click)="showCreateModal.set(true)"
+                class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200"
+              >
+                <svg
+                  class="w-5 h-5 inline-block mr-2"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                  />
+                </svg>
+                Create Portfolio
+              </button>
+            </div>
           </div>
         </div>
       </div>
