@@ -17,7 +17,6 @@ import { SharePortfolioComponent } from "../components/share-portfolio.component
     FormsModule,
     FirebaseSetupComponent,
     HeaderComponent,
-    SharePortfolioComponent,
   ],
   template: `
     <div class="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">

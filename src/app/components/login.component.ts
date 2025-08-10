@@ -37,7 +37,7 @@ import { AuthService } from "../services/auth.service";
           </p>
         </div>
 
-        @if (authService.getError()) {
+        @if (authService.error()) {
           <div class="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
             <div class="flex items-center">
               <svg
@@ -58,7 +58,7 @@ import { AuthService } from "../services/auth.service";
                   Authentication Error
                 </h3>
                 <p class="text-red-700 text-sm mt-1">
-                  {{ authService.getError() }}
+                  {{ authService.error() }}
                 </p>
               </div>
             </div>
@@ -67,10 +67,10 @@ import { AuthService } from "../services/auth.service";
 
         <button
           (click)="signInWithGoogle()"
-          [disabled]="authService.getLoading()"
+          [disabled]="authService.loading()"
           class="w-full flex items-center justify-center px-4 py-3 border border-gray-300 rounded-lg shadow-sm bg-white text-gray-700 font-medium hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          @if (authService.getLoading()) {
+          @if (authService.loading()) {
             <div
               class="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600 mr-3"
             ></div>

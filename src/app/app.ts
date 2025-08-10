@@ -7,7 +7,7 @@ import { AuthService } from "./services/auth.service";
   selector: "app-root",
   imports: [CommonModule, RouterOutlet],
   template: `
-    @if (authService.getLoading()) {
+    @if (authService.loading()) {
       <!-- Loading Screen -->
       <div
         class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center"
@@ -53,26 +53,25 @@ export class App implements OnInit {
 
   ngOnInit() {
     console.log("🚀 Portfolio Manager App Initialized");
-
     // Immediate check: if no user after 1 second, redirect to login
-    setTimeout(() => {
-      if (
-        this.authService.getLoading()() ||
-        !this.authService.isAuthenticated()
-      ) {
-        console.warn("⚠️ No user session detected, redirecting to login");
-        window.location.href = "/login";
-      }
-    }, 1000);
+    // setTimeout(() => {
+    //   if (
+    //     this.authService.getLoading()() ||
+    //     !this.authService.isAuthenticated()
+    //   ) {
+    //     console.warn("⚠️ No user session detected, redirecting to login");
+    //     window.location.href = "/login";
+    //   }
+    // }, 1000);
 
-    // Emergency fallback: if still loading after 3 seconds, force redirect
-    setTimeout(() => {
-      if (this.authService.getLoading()()) {
-        console.warn(
-          "⚠️ App stuck in loading state, forcing redirect to login",
-        );
-        window.location.href = "/login";
-      }
-    }, 3000);
+    // // Emergency fallback: if still loading after 3 seconds, force redirect
+    // setTimeout(() => {
+    //   if (this.authService.getLoading()()) {
+    //     console.warn(
+    //       "⚠️ App stuck in loading state, forcing redirect to login",
+    //     );
+    //     window.location.href = "/login";
+    //   }
+    // }, 3000);
   }
 }

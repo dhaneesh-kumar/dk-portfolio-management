@@ -14,22 +14,12 @@ import { User } from "../models/portfolio.model";
 })
 export class AuthService {
   private auth: any;
-  private user = signal<User | null>(null);
-  private loading = signal<boolean>(true);
-  private error = signal<string | null>(null);
+  user = signal<User | null>(null);
+  loading = signal<boolean>(true);
+  error = signal<string | null>(null);
 
   constructor() {
     this.initFirebaseAuth();
-
-    // Emergency fallback: if Firebase doesn't initialize within 2 seconds,
-    // assume no user and redirect to login
-    setTimeout(() => {
-      if (this.loading()) {
-        console.warn("⚠️ Firebase taking too long, assuming no user session");
-        this.user.set(null);
-        this.loading.set(false);
-      }
-    }, 2000);
   }
 
   private initFirebaseAuth() {
@@ -45,17 +35,6 @@ export class AuthService {
     }
   }
 
-  getUser() {
-    return this.user.asReadonly();
-  }
-
-  getLoading() {
-    return this.loading.asReadonly();
-  }
-
-  getError() {
-    return this.error.asReadonly();
-  }
 
   isAuthenticated() {
     return this.user() !== null;
@@ -71,19 +50,19 @@ export class AuthService {
 
     try {
       // Add a timeout to prevent infinite loading
-      const authTimeout = setTimeout(() => {
-        console.warn("⚠️ Auth initialization timed out, redirecting to login");
-        this.user.set(null);
-        this.loading.set(false);
-        // Force redirect to login after timeout
-        window.location.href = "/login";
-      }, 3000); // Reduced to 3 seconds
+      // const authTimeout = setTimeout(() => {
+      //   console.warn("⚠️ Auth initialization timed out, redirecting to login");
+      //   this.user.set(null);
+      //   this.loading.set(false);
+      //   // Force redirect to login after timeout
+      //   window.location.href = "/login";
+      // }, 3000); // Reduced to 3 seconds
 
       onAuthStateChanged(
         this.auth,
         (firebaseUser: FirebaseUser | null) => {
-          clearTimeout(authTimeout); // Clear timeout once auth state is determined
-
+          // clearTimeout(authTimeout); // Clear timeout once auth state is determined
+          console.log("🔄 Auth state changed:", firebaseUser ? firebaseUser.email : "No user");
           if (firebaseUser) {
             const user: User = {
               uid: firebaseUser.uid,
@@ -98,22 +77,23 @@ export class AuthService {
             this.user.set(null);
             console.log("📝 No user session found, redirecting to login");
             // Immediately redirect to login if no user
-            setTimeout(() => {
-              if (!this.isAuthenticated()) {
-                window.location.href = "/login";
-              }
-            }, 100);
+            // setTimeout(() => {
+            //   if (!this.isAuthenticated()) {
+            //     window.location.href = "/login";
+            //   }
+            // }, 100);
+            this.loading.set(false);
           }
           this.loading.set(false);
         },
         (error) => {
-          clearTimeout(authTimeout);
+          // clearTimeout(authTimeout);
           console.error("❌ Auth state change error:", error);
           this.user.set(null);
           this.loading.set(false);
           this.error.set("Authentication initialization failed");
           // Redirect to login on error
-          setTimeout(() => (window.location.href = "/login"), 1000);
+          // setTimeout(() => (window.location.href = "/login"), 1000);
         },
       );
     } catch (error) {
@@ -122,7 +102,6 @@ export class AuthService {
       this.loading.set(false);
       this.error.set("Authentication service unavailable");
       // Redirect to login on error
-      setTimeout(() => (window.location.href = "/login"), 1000);
     }
   }
 

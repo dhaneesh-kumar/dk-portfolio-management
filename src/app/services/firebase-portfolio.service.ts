@@ -56,7 +56,7 @@ export class FirebasePortfolioService {
       this.loading.set(true);
       this.error.set(null);
 
-      const user = this.authService.getUser()();
+      const user = this.authService.user();
       if (!user) {
         this.portfolios.set([]);
         return;
@@ -142,7 +142,7 @@ export class FirebasePortfolioService {
         return null;
       }
 
-      const user = this.authService.getUser()();
+      const user = this.authService.user();
       if (!user) return null;
 
       const portfolioData = {
@@ -381,7 +381,7 @@ export class FirebasePortfolioService {
 
   private initializeSampleData(): void {
     // Fallback sample data when Firebase is not available
-    const user = this.authService.getUser()();
+    const user = this.authService.user();
     if (!user) return;
 
     const nifty50: Portfolio = {
@@ -485,7 +485,7 @@ export class FirebasePortfolioService {
     try {
       if (!db) return false;
 
-      const user = this.authService.getUser()();
+      const user = this.authService.user();
       if (!user) return false;
 
       const shareData = {
@@ -551,7 +551,7 @@ export class FirebasePortfolioService {
     try {
       if (!db) return false;
 
-      const user = this.authService.getUser()();
+      const user = this.authService.user();
       if (!user) return false;
 
       const commentData = {
