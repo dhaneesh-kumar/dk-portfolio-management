@@ -3,19 +3,22 @@
 [build]
   # Directory to change to before starting a build
   base = "."
-  
+
   # Directory that contains the deploy-ready HTML files and assets
   publish = "dist/fusion-angular-tailwind-starter"
-  
+
   # Default build command
-  command = "npm run build"
+  command = "npm ci && npm run build --prod"
 
 [build.environment]
   # Node.js version
   NODE_VERSION = "18"
-  
-  # Angular CLI version
+
+  # Install dev dependencies for build
   NPM_FLAGS = "--production=false"
+
+  # Set Angular production mode
+  NODE_ENV = "production"
 
 # Redirect rules for Angular SPA routing
 [[redirects]]
