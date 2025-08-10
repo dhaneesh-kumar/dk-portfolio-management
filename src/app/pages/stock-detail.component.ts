@@ -453,19 +453,20 @@ export class StockDetailComponent {
     this.noteForm.content = note.content;
   }
 
-  saveNote(): void {
+  async saveNote(): Promise<void> {
     if (this.noteForm.section.trim() && this.noteForm.content.trim()) {
       const editing = this.editingNote();
+      let result = false;
 
       if (editing) {
-        this.portfolioService.updateStockNote(
+        result = await this.portfolioService.updateStockNote(
           this.portfolioId(),
           this.stockId(),
           editing.id,
           this.noteForm.content.trim(),
         );
       } else {
-        this.portfolioService.addStockNote(
+        result = await this.portfolioService.addStockNote(
           this.portfolioId(),
           this.stockId(),
           this.noteForm.section.trim(),
@@ -473,7 +474,9 @@ export class StockDetailComponent {
         );
       }
 
-      this.cancelNote();
+      if (result) {
+        this.cancelNote();
+      }
     }
   }
 
