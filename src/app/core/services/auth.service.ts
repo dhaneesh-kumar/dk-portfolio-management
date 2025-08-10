@@ -43,7 +43,7 @@ export class AuthService implements OnDestroy {
   // Auth readiness signal
   private readonly _authReady = new ReplaySubject<boolean>(1);
 
-  private firebaseAuth: Auth | null = null;
+  private firebaseAuth: Auth | null | undefined = null;
   private authSubscription: Subscription | null = null;
 
   constructor(
