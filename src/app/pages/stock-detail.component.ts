@@ -390,7 +390,7 @@ import { Stock, StockNote } from "../models/portfolio.model";
 })
 export class StockDetailComponent {
   private route = inject(ActivatedRoute);
-  private portfolioService = inject(PortfolioService);
+  private portfolioService = inject(FirebasePortfolioService);
 
   stockId = signal<string>("");
   portfolioId = signal<string>("");
