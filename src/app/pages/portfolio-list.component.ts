@@ -414,13 +414,26 @@ import { SharePortfolioComponent } from "../components/share-portfolio.component
 })
 export class PortfolioListComponent {
   private portfolioService = inject(FirebasePortfolioService);
+  private marketDataService = inject(MarketDataService);
 
   portfolios = this.portfolioService.getPortfolios();
   loading = this.portfolioService.getLoading();
   error = this.portfolioService.getError();
+  isRefreshing = this.marketDataService.getIsRefreshing();
+  lastRefresh = this.marketDataService.getLastRefresh();
+
   showCreateModal = signal(false);
   newPortfolioName = "";
   newPortfolioDescription = "";
+
+  marketStatus = signal(this.marketDataService.getMarketStatus());
+
+  constructor() {
+    // Update market status every minute
+    setInterval(() => {
+      this.marketStatus.set(this.marketDataService.getMarketStatus());
+    }, 60000);
+  }
 
   getTotalValue(): number {
     return this.portfolios().reduce(
