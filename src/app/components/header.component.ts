@@ -49,14 +49,14 @@ import { AuthService } from "../services/auth.service";
           </div>
 
           <!-- User Menu -->
-          @if (authService.getUser()()) {
+          @if (authService.user()) {
             <div class="flex items-center space-x-4">
               <!-- User Info -->
               <div class="flex items-center space-x-3">
-                @if (authService.getUser()()?.photoURL) {
+                @if (authService.user()?.photoURL) {
                   <img
-                    [src]="authService.getUser()()?.photoURL"
-                    [alt]="authService.getUser()()?.displayName"
+                    [src]="authService.user()?.photoURL"
+                    [alt]="authService.user()?.displayName"
                     class="w-8 h-8 rounded-full border-2 border-gray-200"
                   />
                 } @else {
@@ -81,10 +81,10 @@ import { AuthService } from "../services/auth.service";
 
                 <div class="hidden sm:block">
                   <p class="text-sm font-medium text-gray-900">
-                    {{ authService.getUser()()?.displayName }}
+                    {{ authService.user()?.displayName }}
                   </p>
                   <p class="text-xs text-gray-500">
-                    {{ authService.getUser()()?.email }}
+                    {{ authService.user()?.email }}
                   </p>
                 </div>
               </div>
