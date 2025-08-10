@@ -52,13 +52,22 @@ export class AuthService {
   }
 
   private initAuthListener() {
+    if (!this.auth) {
+      console.error('❌ Firebase Auth not initialized');
+      this.user.set(null);
+      this.loading.set(false);
+      return;
+    }
+
     try {
       // Add a timeout to prevent infinite loading
       const authTimeout = setTimeout(() => {
-        console.warn('⚠️ Auth initialization timed out, assuming no user');
+        console.warn('⚠️ Auth initialization timed out, redirecting to login');
         this.user.set(null);
         this.loading.set(false);
-      }, 5000); // 5 second timeout
+        // Force redirect to login after timeout
+        window.location.href = '/login';
+      }, 3000); // Reduced to 3 seconds
 
       onAuthStateChanged(this.auth, (firebaseUser: FirebaseUser | null) => {
         clearTimeout(authTimeout); // Clear timeout once auth state is determined
@@ -74,7 +83,13 @@ export class AuthService {
           console.log('✅ User authenticated:', user.email);
         } else {
           this.user.set(null);
-          console.log('📝 No user session found');
+          console.log('📝 No user session found, redirecting to login');
+          // Immediately redirect to login if no user
+          setTimeout(() => {
+            if (!this.isAuthenticated()) {
+              window.location.href = '/login';
+            }
+          }, 100);
         }
         this.loading.set(false);
       }, (error) => {
@@ -83,12 +98,16 @@ export class AuthService {
         this.user.set(null);
         this.loading.set(false);
         this.error.set('Authentication initialization failed');
+        // Redirect to login on error
+        setTimeout(() => window.location.href = '/login', 1000);
       });
     } catch (error) {
       console.error('❌ Failed to initialize auth listener:', error);
       this.user.set(null);
       this.loading.set(false);
       this.error.set('Authentication service unavailable');
+      // Redirect to login on error
+      setTimeout(() => window.location.href = '/login', 1000);
     }
   }
 
