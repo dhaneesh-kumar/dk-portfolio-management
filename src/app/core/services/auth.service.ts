@@ -197,6 +197,14 @@ export class AuthService implements OnDestroy {
    * Send password reset email
    */
   async resetPassword(email: string): Promise<boolean> {
+    if (!this.firebaseAuth) {
+      this.notificationService.error(
+        "Authentication unavailable",
+        "Firebase authentication is not configured",
+      );
+      return false;
+    }
+
     return this.executeAuthAction(async () => {
       await sendPasswordResetEmail(this.firebaseAuth!, email);
       this.logger.info("Password reset email sent", { email });
