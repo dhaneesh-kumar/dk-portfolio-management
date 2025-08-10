@@ -1,5 +1,6 @@
 import { initializeApp, FirebaseApp } from "firebase/app";
 import { getFirestore, Firestore } from "firebase/firestore";
+import { getAuth, Auth } from "firebase/auth";
 
 // Firebase configuration
 // 🔧 TO ENABLE FIREBASE: Replace these placeholder values with your actual Firebase project config
