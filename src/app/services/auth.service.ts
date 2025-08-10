@@ -20,6 +20,16 @@ export class AuthService {
 
   constructor() {
     this.initFirebaseAuth();
+
+    // Emergency fallback: if Firebase doesn't initialize within 2 seconds,
+    // assume no user and redirect to login
+    setTimeout(() => {
+      if (this.loading()) {
+        console.warn('⚠️ Firebase taking too long, assuming no user session');
+        this.user.set(null);
+        this.loading.set(false);
+      }
+    }, 2000);
   }
 
   private initFirebaseAuth() {
