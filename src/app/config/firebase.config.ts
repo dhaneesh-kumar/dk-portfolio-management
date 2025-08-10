@@ -40,6 +40,7 @@ try {
   ) {
     app = initializeApp(firebaseConfig);
     db = getFirestore(app);
+    auth = getAuth(app);
     console.log("✅ Firebase initialized successfully");
   } else {
     console.warn("⚠️ Firebase not configured. Using sample data mode.");
