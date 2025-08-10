@@ -220,8 +220,16 @@ export class AuthService implements OnDestroy {
    * Sign out current user
    */
   async signOut(): Promise<void> {
+    if (!this.firebaseAuth) {
+      this.notificationService.info(
+        "Already signed out",
+        "Firebase authentication is not configured",
+      );
+      return;
+    }
+
     try {
-      await signOut(this.firebaseAuth!);
+      await signOut(this.firebaseAuth);
       this.logger.info("User signed out successfully");
       this.notificationService.info(
         "Signed out",
