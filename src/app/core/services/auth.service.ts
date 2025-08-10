@@ -98,7 +98,7 @@ export class AuthService implements OnDestroy {
       provider.addScope("email");
       provider.addScope("profile");
 
-      const result = await signInWithPopup(this.auth, provider);
+      const result = await signInWithPopup(this.firebaseAuth!, provider);
 
       if (result.user) {
         this.logger.info("Google sign-in successful", { uid: result.user.uid });
