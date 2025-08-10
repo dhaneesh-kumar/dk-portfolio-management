@@ -15,16 +15,15 @@ import { SharePortfolioComponent } from "../components/share-portfolio.component
   template: `
     <div class="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
       <!-- Header -->
-      <header class="bg-white shadow-sm border-b border-slate-200">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <app-header></app-header>
+
+      <!-- Create Portfolio Button -->
+      <div class="bg-white border-b border-slate-200 py-4">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div class="flex items-center justify-between">
             <div>
-              <h1 class="text-3xl font-bold text-slate-900">
-                Portfolio Manager
-              </h1>
-              <p class="text-slate-600 mt-1">
-                Manage your stock portfolios with precision
-              </p>
+              <h2 class="text-2xl font-bold text-slate-900">My Portfolios</h2>
+              <p class="text-slate-600 mt-1">Manage your investment portfolios</p>
             </div>
             <button
               (click)="showCreateModal.set(true)"
@@ -47,7 +46,7 @@ import { SharePortfolioComponent } from "../components/share-portfolio.component
             </button>
           </div>
         </div>
-      </header>
+      </div>
 
       <!-- Main Content -->
       <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
