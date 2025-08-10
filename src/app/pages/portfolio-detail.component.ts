@@ -9,7 +9,7 @@ import { PortfolioChartComponent } from '../components/portfolio-chart.component
 @Component({
   selector: 'app-portfolio-detail',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule],
+  imports: [CommonModule, RouterModule, FormsModule, PortfolioChartComponent],
   template: `
     @if (portfolio()) {
       <div class="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
