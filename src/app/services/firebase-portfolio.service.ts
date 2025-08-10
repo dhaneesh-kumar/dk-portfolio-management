@@ -110,6 +110,9 @@ export class FirebasePortfolioService {
         }
       }
 
+      // Sort portfolios by creation date (newest first) - client-side sorting
+      portfolios.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+
       this.portfolios.set(portfolios);
     } catch (err) {
       console.error("Error loading portfolios:", err);
@@ -537,7 +540,7 @@ export class FirebasePortfolioService {
       console.log("✅ Portfolio share removed successfully");
       return true;
     } catch (error) {
-      console.error("❌ Error removing portfolio share:", error);
+      console.error("�� Error removing portfolio share:", error);
       return false;
     }
   }
