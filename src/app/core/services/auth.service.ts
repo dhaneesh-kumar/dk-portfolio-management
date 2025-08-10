@@ -189,7 +189,7 @@ export class AuthService implements OnDestroy {
    */
   async signOut(): Promise<void> {
     try {
-      await signOut(this.auth);
+      await signOut(this.firebaseAuth!);
       this.logger.info("User signed out successfully");
       this.notificationService.info(
         "Signed out",
