@@ -28,6 +28,8 @@ export class PortfolioService {
     const portfolio: Portfolio = {
       id: this.generateId(),
       name,
+      ownerId: 'sample-user',
+      ownerEmail: 'sample@example.com',
       description,
       stocks: [],
       totalValue: 0,
