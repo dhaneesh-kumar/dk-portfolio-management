@@ -430,4 +430,177 @@ export class FirebasePortfolioService {
 
     this.portfolios.set([nifty50]);
   }
+
+  private convertFirestoreToPortfolio(id: string, data: any): Portfolio {
+    return {
+      id,
+      ...data,
+      createdAt: data["createdAt"]?.toDate() || new Date(),
+      updatedAt: data["updatedAt"]?.toDate() || new Date(),
+      stocks: data["stocks"]?.map((stock: any) => ({
+        ...stock,
+        notes: stock.notes?.map((note: any) => ({
+          ...note,
+          createdAt: note.createdAt?.toDate() || new Date(),
+          updatedAt: note.updatedAt?.toDate() || new Date(),
+        })) || [],
+      })) || [],
+      comments: data["comments"]?.map((comment: any) => ({
+        ...comment,
+        createdAt: comment.createdAt?.toDate() || new Date(),
+        updatedAt: comment.updatedAt?.toDate() || new Date(),
+      })) || [],
+    } as Portfolio;
+  }
+
+  // Sharing Methods
+  async sharePortfolio(
+    portfolioId: string,
+    email: string,
+    permissions: SharePermissions,
+    message?: string
+  ): Promise<boolean> {
+    try {
+      if (!db) return false;
+
+      const user = this.authService.getUser()();
+      if (!user) return false;
+
+      const shareData = {
+        portfolioId,
+        sharedWithEmail: email,
+        sharedById: user.uid,
+        sharedByEmail: user.email,
+        permissions,
+        message: message || '',
+        createdAt: Timestamp.now(),
+        updatedAt: Timestamp.now()
+      };
+
+      await addDoc(collection(db, 'portfolio_shares'), shareData);
+      console.log('✅ Portfolio shared successfully');
+      return true;
+    } catch (error) {
+      console.error('❌ Error sharing portfolio:', error);
+      return false;
+    }
+  }
+
+  async getPortfolioShares(portfolioId: string): Promise<PortfolioShare[]> {
+    try {
+      if (!db) return [];
+
+      const q = query(
+        collection(db, 'portfolio_shares'),
+        where('portfolioId', '==', portfolioId)
+      );
+      const snapshot = await getDocs(q);
+
+      return snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+        createdAt: doc.data()['createdAt']?.toDate() || new Date(),
+        updatedAt: doc.data()['updatedAt']?.toDate() || new Date(),
+      })) as PortfolioShare[];
+    } catch (error) {
+      console.error('Error loading portfolio shares:', error);
+      return [];
+    }
+  }
+
+  async removePortfolioShare(shareId: string): Promise<boolean> {
+    try {
+      if (!db) return false;
+
+      await deleteDoc(doc(db, 'portfolio_shares', shareId));
+      console.log('✅ Portfolio share removed successfully');
+      return true;
+    } catch (error) {
+      console.error('❌ Error removing portfolio share:', error);
+      return false;
+    }
+  }
+
+  // Comments Methods
+  async addPortfolioComment(
+    portfolioId: string,
+    content: string
+  ): Promise<boolean> {
+    try {
+      if (!db) return false;
+
+      const user = this.authService.getUser()();
+      if (!user) return false;
+
+      const commentData = {
+        portfolioId,
+        content,
+        authorId: user.uid,
+        authorEmail: user.email,
+        authorName: user.displayName,
+        createdAt: Timestamp.now(),
+        updatedAt: Timestamp.now()
+      };
+
+      await addDoc(collection(db, 'portfolio_comments'), commentData);
+
+      // Reload portfolios to include the new comment
+      await this.loadPortfolios();
+
+      console.log('✅ Comment added successfully');
+      return true;
+    } catch (error) {
+      console.error('❌ Error adding comment:', error);
+      return false;
+    }
+  }
+
+  async getPortfolioComments(portfolioId: string): Promise<PortfolioComment[]> {
+    try {
+      if (!db) return [];
+
+      const q = query(
+        collection(db, 'portfolio_comments'),
+        where('portfolioId', '==', portfolioId),
+        orderBy('createdAt', 'desc')
+      );
+      const snapshot = await getDocs(q);
+
+      return snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+        createdAt: doc.data()['createdAt']?.toDate() || new Date(),
+        updatedAt: doc.data()['updatedAt']?.toDate() || new Date(),
+      })) as PortfolioComment[];
+    } catch (error) {
+      console.error('Error loading comments:', error);
+      return [];
+    }
+  }
+
+  // Check permissions for shared portfolios
+  canEditPortfolio(portfolio: Portfolio): boolean {
+    if (!portfolio.isShared) return true;
+    return portfolio.permissions?.canEdit || false;
+  }
+
+  canEditStocks(portfolio: Portfolio): boolean {
+    if (!portfolio.isShared) return true;
+    return portfolio.permissions?.canEditStocks || false;
+  }
+
+  canEditWeights(portfolio: Portfolio): boolean {
+    if (!portfolio.isShared) return true;
+    return portfolio.permissions?.canEditWeights || false;
+  }
+
+  canAddNotes(portfolio: Portfolio): boolean {
+    if (!portfolio.isShared) return true;
+    return portfolio.permissions?.canAddNotes || false;
+  }
+
+  canComment(portfolio: Portfolio): boolean {
+    if (!portfolio.isShared) return true;
+    return portfolio.permissions?.canComment || false;
+  }
 }
