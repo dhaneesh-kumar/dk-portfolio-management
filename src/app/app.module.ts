@@ -24,8 +24,8 @@ import { AppComponent } from './app.component';
     // App Core Module (must be imported only once)
     CoreModule,
     
-    // Shared Module (reusable components and utilities)
-    SharedModule,
+    // Shared Module (temporarily disabled for debugging)
+    // SharedModule,
     
     // App Routing (must be last)
     AppRoutingModule,
