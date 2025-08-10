@@ -6,14 +6,11 @@ import { RouterModule } from '@angular/router';
 // Layout components
 import { HeaderComponent } from './components/header/header.component';
 import { FooterComponent } from './components/footer/footer.component';
-import { NotificationToastComponent } from './components/notification-toast/notification-toast.component';
 
 @NgModule({
   declarations: [
-    // Layout Components
     HeaderComponent,
     FooterComponent,
-    NotificationToastComponent,
   ],
   imports: [
     CommonModule,
@@ -31,7 +28,6 @@ import { NotificationToastComponent } from './components/notification-toast/noti
     // Layout Components
     HeaderComponent,
     FooterComponent,
-    NotificationToastComponent,
   ]
 })
 export class SharedModule { }
