@@ -13,17 +13,9 @@ import { AppRoutingModule } from './app-routing.module';
 // Main App Component
 import { AppComponent } from './app.component';
 
-// Layout Components
-import { HeaderComponent } from './shared/components/header/header.component';
-import { FooterComponent } from './shared/components/footer/footer.component';
-import { NotificationToastComponent } from './shared/components/notification-toast/notification-toast.component';
-
 @NgModule({
   declarations: [
     AppComponent,
-    HeaderComponent,
-    FooterComponent,
-    NotificationToastComponent,
   ],
   imports: [
     // Angular Core Modules
