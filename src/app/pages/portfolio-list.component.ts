@@ -474,4 +474,8 @@ export class PortfolioListComponent {
       await this.portfolioService.deletePortfolio(id);
     }
   }
+
+  async refreshAllData(): Promise<void> {
+    await this.marketDataService.refreshAllPortfolioData();
+  }
 }
