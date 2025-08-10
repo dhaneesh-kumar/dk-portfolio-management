@@ -1,6 +1,5 @@
 import { Injectable, signal, OnDestroy } from "@angular/core";
 import {
-  getAuth,
   signInWithPopup,
   GoogleAuthProvider,
   signOut,
@@ -10,6 +9,7 @@ import {
   createUserWithEmailAndPassword,
   updateProfile,
   sendPasswordResetEmail,
+  Auth,
 } from "firebase/auth";
 import {
   fromEventPattern,
@@ -23,6 +23,7 @@ import { User } from "../../shared/models/user.model";
 import { LoggerService } from "./logger.service";
 import { NotificationService } from "./notification.service";
 import { AUTH_ERROR_MESSAGES } from "../constants/auth.constants";
+import { auth } from "../../config/firebase.config";
 
 export interface AuthState {
   user: User | null;
