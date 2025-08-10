@@ -104,27 +104,6 @@ export class FirebasePortfolioService {
         }
       }
 
-      const portfolios: Portfolio[] = [];
-      querySnapshot.forEach((doc) => {
-        const data = doc.data();
-        portfolios.push({
-          id: doc.id,
-          ...data,
-          createdAt: data["createdAt"]?.toDate() || new Date(),
-          updatedAt: data["updatedAt"]?.toDate() || new Date(),
-          stocks:
-            data["stocks"]?.map((stock: any) => ({
-              ...stock,
-              notes:
-                stock.notes?.map((note: any) => ({
-                  ...note,
-                  createdAt: note.createdAt?.toDate() || new Date(),
-                  updatedAt: note.updatedAt?.toDate() || new Date(),
-                })) || [],
-            })) || [],
-        } as Portfolio);
-      });
-
       this.portfolios.set(portfolios);
     } catch (err) {
       console.error("Error loading portfolios:", err);
