@@ -21,6 +21,7 @@ import {
   PortfolioShare,
   SharePermissions,
   PortfolioComment,
+  MarketData,
 } from "../models/portfolio.model";
 import { AuthService } from "./auth.service";
 
