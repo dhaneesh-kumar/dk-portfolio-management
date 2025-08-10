@@ -138,8 +138,7 @@ import { APP_CONSTANTS } from "../../../core/constants/app.constants";
       </div>
     </header>
   `,
-  standalone: true,
-  imports: [],
+  standalone: false,
 })
 export class HeaderComponent {
   private readonly authService = inject(AuthService);
