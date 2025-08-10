@@ -3,13 +3,15 @@ import { CommonModule } from "@angular/common";
 import { RouterModule, ActivatedRoute, Router } from "@angular/router";
 import { FormsModule } from "@angular/forms";
 import { FirebasePortfolioService } from "../services/firebase-portfolio.service";
+import { StockApiService, StockSearchResult } from "../services/stock-api.service";
 import { Portfolio, Stock } from "../models/portfolio.model";
 import { PortfolioChartComponent } from "../components/portfolio-chart.component";
+import { StockSearchComponent } from "../components/stock-search.component";
 
 @Component({
   selector: "app-portfolio-detail",
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, PortfolioChartComponent],
+  imports: [CommonModule, RouterModule, FormsModule, PortfolioChartComponent, StockSearchComponent],
   template: `
     @if (portfolio()) {
       <div class="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
@@ -415,32 +417,32 @@ import { PortfolioChartComponent } from "../components/portfolio-chart.component
 
               <form (ngSubmit)="addStock()" #form="ngForm">
                 <div class="mb-4">
-                  <label class="block text-sm font-medium text-slate-700 mb-2"
-                    >Stock Ticker</label
-                  >
-                  <input
-                    type="text"
-                    [(ngModel)]="newStock.ticker"
-                    name="ticker"
-                    required
-                    class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    placeholder="e.g., RELIANCE"
-                  />
+                  <app-stock-search
+                    (stockSelected)="onStockSelected($event)"
+                  ></app-stock-search>
                 </div>
 
-                <div class="mb-4">
-                  <label class="block text-sm font-medium text-slate-700 mb-2"
-                    >Company Name</label
-                  >
-                  <input
-                    type="text"
-                    [(ngModel)]="newStock.name"
-                    name="name"
-                    required
-                    class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    placeholder="e.g., Reliance Industries Ltd"
-                  />
-                </div>
+                @if (selectedStock()) {
+                  <div class="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                    <div class="flex items-center gap-3">
+                      <div class="flex-1">
+                        <div class="font-medium text-slate-900">{{ selectedStock()!.symbol }}</div>
+                        <div class="text-sm text-slate-600">{{ selectedStock()!.name }}</div>
+                      </div>
+                      @if (stockQuote()) {
+                        <div class="text-right">
+                          <div class="font-bold text-slate-900">₹{{ stockQuote()!.price | number: "1.2-2" }}</div>
+                          <div
+                            class="text-sm"
+                            [class]="stockQuote()!.changePercent >= 0 ? 'text-green-600' : 'text-red-600'"
+                          >
+                            {{ stockQuote()!.changePercent >= 0 ? "+" : "" }}{{ stockQuote()!.changePercent | number: "1.2-2" }}%
+                          </div>
+                        </div>
+                      }
+                    </div>
+                  </div>
+                }
 
                 <div class="grid grid-cols-2 gap-4 mb-4">
                   <div>
@@ -462,16 +464,27 @@ import { PortfolioChartComponent } from "../components/portfolio-chart.component
                     <label class="block text-sm font-medium text-slate-700 mb-2"
                       >Price (₹)</label
                     >
-                    <input
-                      type="number"
-                      [(ngModel)]="newStock.currentPrice"
-                      name="price"
-                      required
-                      min="0.01"
-                      step="0.01"
-                      class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                      placeholder="2450.50"
-                    />
+                    <div class="relative">
+                      <input
+                        type="number"
+                        [(ngModel)]="newStock.currentPrice"
+                        name="price"
+                        required
+                        min="0.01"
+                        step="0.01"
+                        class="w-full px-3 py-2 pr-20 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        [placeholder]="stockQuote()?.price ? stockQuote()!.price.toString() : '2450.50'"
+                      />
+                      @if (stockQuote() && !newStock.currentPrice) {
+                        <button
+                          type="button"
+                          (click)="useCurrentPrice()"
+                          class="absolute right-2 top-1/2 transform -translate-y-1/2 text-xs bg-blue-600 text-white px-2 py-1 rounded hover:bg-blue-700"
+                        >
+                          Use Live
+                        </button>
+                      }
+                    </div>
                   </div>
                 </div>
 
@@ -502,7 +515,7 @@ import { PortfolioChartComponent } from "../components/portfolio-chart.component
                   </button>
                   <button
                     type="submit"
-                    [disabled]="!form.valid"
+                    [disabled]="!form.valid || !selectedStock()"
                     class="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     Add Stock
@@ -531,6 +544,7 @@ export class PortfolioDetailComponent {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private portfolioService = inject(FirebasePortfolioService);
+  private stockApiService = inject(StockApiService);
 
   portfolioId = signal<string>("");
   portfolio = computed(() => {
@@ -539,6 +553,8 @@ export class PortfolioDetailComponent {
   });
 
   showAddStockModal = signal(false);
+  selectedStock = signal<StockSearchResult | null>(null);
+  stockQuote = signal<any>(null);
   newStock = {
     ticker: "",
     name: "",
@@ -580,17 +596,28 @@ export class PortfolioDetailComponent {
   }
 
   async addStock(): Promise<void> {
+    const selected = this.selectedStock();
     if (
-      this.newStock.ticker &&
-      this.newStock.name &&
+      selected &&
       this.newStock.shares > 0 &&
       this.newStock.currentPrice > 0
     ) {
+      const stockData = {
+        ticker: selected.symbol,
+        name: selected.name,
+        weight: this.newStock.weight,
+        shares: this.newStock.shares,
+        currentPrice: this.newStock.currentPrice,
+      };
+
       const result = await this.portfolioService.addStockToPortfolio(
         this.portfolioId(),
-        this.newStock,
+        stockData,
       );
+
       if (result) {
+        // Fetch and update market data for the newly added stock
+        this.updateStockMarketData(selected.symbol);
         this.resetNewStock();
         this.showAddStockModal.set(false);
       }
@@ -598,6 +625,8 @@ export class PortfolioDetailComponent {
   }
 
   resetNewStock(): void {
+    this.selectedStock.set(null);
+    this.stockQuote.set(null);
     this.newStock = {
       ticker: "",
       name: "",
@@ -615,5 +644,52 @@ export class PortfolioDetailComponent {
     ) {
       await this.portfolioService.rebalancePortfolio(this.portfolioId());
     }
+  }
+
+  onStockSelected(stock: StockSearchResult): void {
+    this.selectedStock.set(stock);
+    this.newStock.ticker = stock.symbol;
+    this.newStock.name = stock.name;
+
+    // Fetch real-time quote
+    this.stockApiService.getStockQuote(stock.symbol).subscribe({
+      next: (quote) => {
+        if (quote) {
+          this.stockQuote.set(quote);
+          // Auto-fill current price if not already set
+          if (!this.newStock.currentPrice) {
+            this.newStock.currentPrice = quote.price;
+          }
+        }
+      },
+      error: (error) => {
+        console.error('Failed to fetch stock quote:', error);
+      }
+    });
+  }
+
+  useCurrentPrice(): void {
+    const quote = this.stockQuote();
+    if (quote) {
+      this.newStock.currentPrice = quote.price;
+    }
+  }
+
+  private async updateStockMarketData(symbol: string): Promise<void> {
+    this.stockApiService.getStockQuote(symbol).subscribe({
+      next: async (quote) => {
+        if (quote) {
+          const marketData = this.stockApiService.convertToMarketData(quote);
+          await this.portfolioService.updateStockMarketData(
+            this.portfolioId(),
+            symbol,
+            marketData
+          );
+        }
+      },
+      error: (error) => {
+        console.error('Failed to update market data:', error);
+      }
+    });
   }
 }
