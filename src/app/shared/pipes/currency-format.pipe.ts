@@ -3,7 +3,6 @@ import { APP_CONSTANTS } from "../../core/constants/app.constants";
 
 @Pipe({
   name: "currencyFormat",
-  standalone: true,
 })
 export class CurrencyFormatPipe implements PipeTransform {
   transform(
