@@ -4,8 +4,8 @@ import { BrowserModule } from '@angular/platform-browser';
 // Core Module (singleton services, guards, interceptors)
 import { CoreModule } from './core/core.module';
 
-// Shared Module (reusable components, pipes, directives)
-import { SharedModule } from './shared/shared.module';
+// Shared Module (temporarily disabled for debugging)
+// import { SharedModule } from './shared/shared.module';
 
 // Routing
 import { AppRoutingModule } from './app-routing.module';
