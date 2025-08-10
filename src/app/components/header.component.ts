@@ -13,7 +13,7 @@ import { AuthService } from "../services/auth.service";
         <div class="flex items-center justify-between h-16">
           <!-- Logo and Navigation -->
           <div class="flex items-center space-x-8">
-            <a routerLink="/" class="flex items-center space-x-2">
+            <a routerLink="/dashboard" class="flex items-center space-x-2">
               <div
                 class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center"
               >
