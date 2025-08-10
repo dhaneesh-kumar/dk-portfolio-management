@@ -135,6 +135,72 @@ export class AuthService {
     }
   }
 
+  async signInWithEmail(email: string, password: string): Promise<boolean> {
+    try {
+      this.loading.set(true);
+      this.error.set(null);
+
+      const result = await signInWithEmailAndPassword(this.auth, email, password);
+
+      if (result.user) {
+        console.log("✅ Email sign-in successful");
+        return true;
+      }
+
+      return false;
+    } catch (error: any) {
+      console.error("❌ Email sign-in failed:", error);
+      this.error.set(this.getErrorMessage(error));
+      return false;
+    } finally {
+      this.loading.set(false);
+    }
+  }
+
+  async signUpWithEmail(email: string, password: string, displayName?: string): Promise<boolean> {
+    try {
+      this.loading.set(true);
+      this.error.set(null);
+
+      const result = await createUserWithEmailAndPassword(this.auth, email, password);
+
+      if (result.user && displayName) {
+        // Update the user's display name
+        await updateProfile(result.user, { displayName });
+      }
+
+      if (result.user) {
+        console.log("✅ Email sign-up successful");
+        return true;
+      }
+
+      return false;
+    } catch (error: any) {
+      console.error("❌ Email sign-up failed:", error);
+      this.error.set(this.getErrorMessage(error));
+      return false;
+    } finally {
+      this.loading.set(false);
+    }
+  }
+
+  async resetPassword(email: string): Promise<boolean> {
+    try {
+      this.loading.set(true);
+      this.error.set(null);
+
+      await sendPasswordResetEmail(this.auth, email);
+      console.log("✅ Password reset email sent");
+      return true;
+    } catch (error: any) {
+      console.error("❌ Password reset failed:", error);
+      this.error.set(this.getErrorMessage(error));
+      return false;
+    } finally {
+      this.loading.set(false);
+    }
+  }
+
   async signOut(): Promise<void> {
     try {
       await signOut(this.auth);
