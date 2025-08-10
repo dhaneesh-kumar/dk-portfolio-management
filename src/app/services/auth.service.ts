@@ -39,7 +39,6 @@ export class AuthService {
     }
   }
 
-
   isAuthenticated() {
     return this.user() !== null;
   }
@@ -66,7 +65,10 @@ export class AuthService {
         this.auth,
         (firebaseUser: FirebaseUser | null) => {
           // clearTimeout(authTimeout); // Clear timeout once auth state is determined
-          console.log("🔄 Auth state changed:", firebaseUser ? firebaseUser.email : "No user");
+          console.log(
+            "🔄 Auth state changed:",
+            firebaseUser ? firebaseUser.email : "No user",
+          );
           if (firebaseUser) {
             const user: User = {
               uid: firebaseUser.uid,
@@ -140,7 +142,11 @@ export class AuthService {
       this.loading.set(true);
       this.error.set(null);
 
-      const result = await signInWithEmailAndPassword(this.auth, email, password);
+      const result = await signInWithEmailAndPassword(
+        this.auth,
+        email,
+        password,
+      );
 
       if (result.user) {
         console.log("✅ Email sign-in successful");
@@ -157,12 +163,20 @@ export class AuthService {
     }
   }
 
-  async signUpWithEmail(email: string, password: string, displayName?: string): Promise<boolean> {
+  async signUpWithEmail(
+    email: string,
+    password: string,
+    displayName?: string,
+  ): Promise<boolean> {
     try {
       this.loading.set(true);
       this.error.set(null);
 
-      const result = await createUserWithEmailAndPassword(this.auth, email, password);
+      const result = await createUserWithEmailAndPassword(
+        this.auth,
+        email,
+        password,
+      );
 
       if (result.user && displayName) {
         // Update the user's display name
