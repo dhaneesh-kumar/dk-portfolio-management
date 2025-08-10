@@ -3,14 +3,9 @@ import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 
-// Layout components
-import { HeaderComponent } from './components/header/header.component';
-import { FooterComponent } from './components/footer/footer.component';
-
 @NgModule({
   declarations: [
-    HeaderComponent,
-    FooterComponent,
+    // No components for now - will add after fixing base issues
   ],
   imports: [
     CommonModule,
@@ -24,10 +19,6 @@ import { FooterComponent } from './components/footer/footer.component';
     FormsModule,
     ReactiveFormsModule,
     RouterModule,
-    
-    // Layout Components
-    HeaderComponent,
-    FooterComponent,
   ]
 })
 export class SharedModule { }
