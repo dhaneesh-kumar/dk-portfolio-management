@@ -10,8 +10,15 @@ import { ClickOutsideDirective } from './directives/click-outside.directive';
 import { CurrencyFormatPipe } from './pipes/currency-format.pipe';
 import { PercentageFormatPipe } from './pipes/percentage-format.pipe';
 
-const SHARED_COMPONENTS: any[] = [
-  // Components will be added as they are created
+// Import layout components
+import { HeaderComponent } from './components/header/header.component';
+import { FooterComponent } from './components/footer/footer.component';
+import { NotificationToastComponent } from './components/notification-toast/notification-toast.component';
+
+const SHARED_COMPONENTS = [
+  HeaderComponent,
+  FooterComponent,
+  NotificationToastComponent,
 ];
 
 const SHARED_DIRECTIVES = [
