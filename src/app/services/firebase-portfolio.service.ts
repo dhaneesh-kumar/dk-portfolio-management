@@ -42,10 +42,17 @@ export class FirebasePortfolioService {
     try {
       this.loading.set(true);
       this.error.set(null);
-      
+
+      // Check if Firebase is configured
+      if (!db) {
+        this.error.set('Firebase not configured. Using sample data.');
+        this.initializeSampleData();
+        return;
+      }
+
       const q = query(collection(db, 'portfolios'), orderBy('createdAt', 'desc'));
       const querySnapshot = await getDocs(q);
-      
+
       const portfolios: Portfolio[] = [];
       querySnapshot.forEach((doc) => {
         const data = doc.data();
@@ -64,7 +71,7 @@ export class FirebasePortfolioService {
           })) || []
         } as Portfolio);
       });
-      
+
       this.portfolios.set(portfolios);
     } catch (err) {
       console.error('Error loading portfolios:', err);
