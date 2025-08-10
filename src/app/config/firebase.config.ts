@@ -1,5 +1,5 @@
-import { initializeApp } from 'firebase/app';
-import { getFirestore } from 'firebase/firestore';
+import { initializeApp, FirebaseApp } from 'firebase/app';
+import { getFirestore, Firestore } from 'firebase/firestore';
 
 // Firebase configuration
 // 🔧 TO ENABLE FIREBASE: Replace these placeholder values with your actual Firebase project config
@@ -26,8 +26,8 @@ const firebaseConfig = {
 // - Set up proper Firestore security rules
 // - Consider using Firebase Authentication
 
-let app;
-let db;
+let app: FirebaseApp | undefined;
+let db: Firestore | undefined;
 
 try {
   // Initialize Firebase only if valid config is provided
