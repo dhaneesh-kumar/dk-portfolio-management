@@ -136,8 +136,7 @@ import {
       }
     </style>
   `,
-  standalone: true,
-  imports: [CommonModule],
+  standalone: false,
 })
 export class NotificationToastComponent implements OnInit {
   private readonly notificationService = inject(NotificationService);
