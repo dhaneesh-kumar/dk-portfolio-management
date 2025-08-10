@@ -1,7 +1,13 @@
 import { inject } from "@angular/core";
-import { CanActivateFn, Router, UrlTree, ActivatedRouteSnapshot, RouterStateSnapshot } from "@angular/router";
+import {
+  CanActivateFn,
+  Router,
+  UrlTree,
+  ActivatedRouteSnapshot,
+  RouterStateSnapshot,
+} from "@angular/router";
 import { Observable } from "rxjs";
-import { map, take } from 'rxjs/operators';
+import { map, take } from "rxjs/operators";
 
 import { AuthService } from "../services/auth.service";
 import { LoggerService } from "../services/logger.service";
@@ -23,13 +29,18 @@ export const GuestGuard: CanActivateFn = (
     take(1),
     map((isAuthenticated: boolean) => {
       if (!isAuthenticated) {
-        logger.debug("Guest guard: User not authenticated, allowing access", { route: state.url });
+        logger.debug("Guest guard: User not authenticated, allowing access", {
+          route: state.url,
+        });
         return true;
       } else {
-        logger.info("Guest guard: User authenticated, redirecting to dashboard", { 
-          route: state.url 
-        });
-        
+        logger.info(
+          "Guest guard: User authenticated, redirecting to dashboard",
+          {
+            route: state.url,
+          },
+        );
+
         return router.createUrlTree([APP_CONSTANTS.ROUTES.DASHBOARD]);
       }
     }),

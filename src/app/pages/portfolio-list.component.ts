@@ -31,7 +31,9 @@ import { SharePortfolioComponent } from "../components/share-portfolio.component
             <div class="flex-1">
               <div class="flex items-center gap-4">
                 <div>
-                  <h2 class="text-2xl font-bold text-slate-900">My Portfolios</h2>
+                  <h2 class="text-2xl font-bold text-slate-900">
+                    My Portfolios
+                  </h2>
                   <div class="flex items-center gap-4 mt-1">
                     <p class="text-slate-600">
                       Manage your investment portfolios
@@ -39,15 +41,19 @@ import { SharePortfolioComponent } from "../components/share-portfolio.component
                     <div class="flex items-center gap-2">
                       <div
                         class="w-2 h-2 rounded-full"
-                        [class]="marketStatus().isOpen ? 'bg-green-500' : 'bg-red-500'"
+                        [class]="
+                          marketStatus().isOpen ? 'bg-green-500' : 'bg-red-500'
+                        "
                       ></div>
-                      <span class="text-sm text-slate-600">{{ marketStatus().message }}</span>
+                      <span class="text-sm text-slate-600">{{
+                        marketStatus().message
+                      }}</span>
                     </div>
                   </div>
                 </div>
                 @if (lastRefresh()) {
                   <div class="text-xs text-slate-500 ml-4">
-                    Last updated: {{ lastRefresh()! | date:'short' }}
+                    Last updated: {{ lastRefresh()! | date: "short" }}
                   </div>
                 }
               </div>
@@ -72,7 +78,7 @@ import { SharePortfolioComponent } from "../components/share-portfolio.component
                     d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
                   />
                 </svg>
-                {{ isRefreshing() ? 'Refreshing...' : 'Refresh Data' }}
+                {{ isRefreshing() ? "Refreshing..." : "Refresh Data" }}
               </button>
               <button
                 (click)="showCreateModal.set(true)"
@@ -156,10 +162,12 @@ import { SharePortfolioComponent } from "../components/share-portfolio.component
                 <h3 class="text-blue-800 font-medium">Demo Mode Active</h3>
                 <p class="text-blue-700 text-sm mt-1">
                   The app is currently using demo market data for Indian stocks.
-                  In production, this would connect to real-time market data APIs through a backend server.
+                  In production, this would connect to real-time market data
+                  APIs through a backend server.
                 </p>
                 <p class="text-blue-700 text-sm mt-1">
-                  All stock prices, changes, and market data shown are simulated for demonstration purposes.
+                  All stock prices, changes, and market data shown are simulated
+                  for demonstration purposes.
                 </p>
               </div>
             </div>

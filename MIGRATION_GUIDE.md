@@ -5,6 +5,7 @@ This guide helps you migrate your existing Angular portfolio management app to t
 ## 📋 Migration Checklist
 
 ### Phase 1: Core Module Setup ✅
+
 - [x] Create `core/` module structure
 - [x] Move `AuthService` to `core/services/`
 - [x] Create `LoggerService`, `NotificationService`, `LoadingService`
@@ -14,6 +15,7 @@ This guide helps you migrate your existing Angular portfolio management app to t
 - [x] Update guard implementations with proper error handling
 
 ### Phase 2: Shared Module Setup ✅
+
 - [x] Create `shared/` module structure
 - [x] Create reusable components (LoadingSpinner, NotificationToast, Header)
 - [x] Create custom pipes (CurrencyFormat, PercentageFormat)
@@ -22,6 +24,7 @@ This guide helps you migrate your existing Angular portfolio management app to t
 - [x] Move `User` model to shared models
 
 ### Phase 3: Feature Module Migration (Portfolio)
+
 - [x] Create `features/portfolio/` structure
 - [x] Create portfolio feature module and routing
 - [x] Create comprehensive portfolio models
@@ -31,12 +34,14 @@ This guide helps you migrate your existing Angular portfolio management app to t
 - [ ] **NEXT**: Create portfolio calculation service
 
 ### Phase 4: Remaining Feature Modules
+
 - [ ] Create `features/stock/` module
-- [ ] Create `features/auth/` module  
+- [ ] Create `features/auth/` module
 - [ ] Create `features/profile/` module
 - [ ] Migrate existing components to respective features
 
 ### Phase 5: App Module Updates
+
 - [x] Create main `app-routing.module.ts`
 - [x] Create new `app.module.ts` with clean structure
 - [ ] **NEXT**: Update `main.ts` to use new app module
@@ -49,6 +54,7 @@ This guide helps you migrate your existing Angular portfolio management app to t
 #### 1. Move Existing Components
 
 **From:**
+
 ```
 src/app/
 ├── components/
@@ -65,6 +71,7 @@ src/app/
 ```
 
 **To:**
+
 ```
 src/app/
 ├── shared/components/
@@ -86,12 +93,14 @@ src/app/
 #### 2. Update Component Imports
 
 **Old Import Pattern:**
+
 ```typescript
 import { AuthService } from "../services/auth.service";
 import { PortfolioService } from "../services/portfolio.service";
 ```
 
 **New Import Pattern:**
+
 ```typescript
 import { AuthService } from "../../../core/services/auth.service";
 import { PortfolioService } from "../services/portfolio.service";
@@ -101,13 +110,14 @@ import { NotificationService } from "../../../core/services/notification.service
 #### 3. Update Service Patterns
 
 **Old Service:**
+
 ```typescript
 @Injectable({
   providedIn: "root",
 })
 export class PortfolioService {
   portfolios = signal<Portfolio[]>([]);
-  
+
   async createPortfolio(data: any) {
     // Direct implementation
   }
@@ -115,6 +125,7 @@ export class PortfolioService {
 ```
 
 **New Service Pattern:**
+
 ```typescript
 @Injectable()
 export class PortfolioService {
@@ -122,7 +133,7 @@ export class PortfolioService {
   private readonly _portfoliosState = signal<AsyncState<Portfolio[]>>({
     isLoading: false,
     hasError: false,
-    data: []
+    data: [],
   });
 
   // Dependencies
@@ -138,15 +149,15 @@ export class PortfolioService {
     try {
       this.updateState({ isLoading: true });
       const result = await this.dataService.createPortfolio(data);
-      
+
       if (result) {
-        this.notificationService.success('Success', 'Portfolio created');
-        this.logger.info('Portfolio created', { id: result.id });
+        this.notificationService.success("Success", "Portfolio created");
+        this.logger.info("Portfolio created", { id: result.id });
       }
-      
+
       return result;
     } catch (error) {
-      this.handleError('Failed to create portfolio', error as Error);
+      this.handleError("Failed to create portfolio", error as Error);
       return null;
     }
   }
@@ -158,12 +169,14 @@ export class PortfolioService {
 ### 1. Move Services to Appropriate Modules
 
 **Core Services (Singleton):**
+
 - `auth.service.ts` → `core/services/` ✅
 - `firebase-portfolio.service.ts` → Split into feature services
 - `market-data.service.ts` → `features/stock/services/`
 - `stock-api.service.ts` → `features/stock/services/`
 
 **Feature Services:**
+
 - `portfolio.service.ts` → `features/portfolio/services/` ✅
 
 ### 2. Update Service Imports
@@ -172,8 +185,8 @@ Update all components that use services:
 
 ```typescript
 // Update in all components
-import { AuthService } from '../../../core/services/auth.service';
-import { PortfolioService } from '../services/portfolio.service';
+import { AuthService } from "../../../core/services/auth.service";
+import { PortfolioService } from "../services/portfolio.service";
 ```
 
 ## 🗂️ Model Migration
@@ -181,11 +194,13 @@ import { PortfolioService } from '../services/portfolio.service';
 ### 1. Move Models to Appropriate Locations
 
 **From:**
+
 ```
 src/app/models/portfolio.model.ts
 ```
 
 **To:**
+
 ```
 src/app/shared/models/
 ├── base.model.ts        # ✅ Done
@@ -214,11 +229,13 @@ import { Portfolio, Stock } from "../models/portfolio.model";
 ### 1. Update Route Guards
 
 **Old:**
+
 ```typescript
 import { authGuard } from "./guards/auth.guard";
 ```
 
 **New:**
+
 ```typescript
 import { AuthGuard } from "./core/guards/auth.guard";
 ```
@@ -226,27 +243,34 @@ import { AuthGuard } from "./core/guards/auth.guard";
 ### 2. Update Route Configuration
 
 **Old routes.ts:**
+
 ```typescript
 const routes: Routes = [
-  { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
-  { path: 'login', component: LoginComponent },
-  { path: 'dashboard', component: PortfolioListComponent, canActivate: [authGuard] },
+  { path: "", redirectTo: "/dashboard", pathMatch: "full" },
+  { path: "login", component: LoginComponent },
+  {
+    path: "dashboard",
+    component: PortfolioListComponent,
+    canActivate: [authGuard],
+  },
 ];
 ```
 
 **New app-routing.module.ts:**
+
 ```typescript
 const routes: Routes = [
-  { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
+  { path: "", redirectTo: "/dashboard", pathMatch: "full" },
   {
-    path: 'login',
-    loadComponent: () => import('./features/auth/components/login/login.component'),
-    canActivate: [GuestGuard]
+    path: "login",
+    loadComponent: () =>
+      import("./features/auth/components/login/login.component"),
+    canActivate: [GuestGuard],
   },
   {
-    path: 'dashboard',
-    loadChildren: () => import('./features/portfolio/portfolio.module'),
-    canActivate: [AuthGuard]
+    path: "dashboard",
+    loadChildren: () => import("./features/portfolio/portfolio.module"),
+    canActivate: [AuthGuard],
   },
 ];
 ```
@@ -277,13 +301,13 @@ Ensure environment files are properly configured:
 // src/environments/environment.ts
 export const environment = {
   production: false,
-  logLevel: 'debug'
+  logLevel: "debug",
 };
 
 // src/environments/environment.prod.ts
 export const environment = {
   production: true,
-  logLevel: 'warn'
+  logLevel: "warn",
 };
 ```
 
@@ -293,9 +317,9 @@ export const environment = {
 
 ```typescript
 // Update all spec files
-import { AuthService } from '../../../core/services/auth.service';
-import { TestBed } from '@angular/core/testing';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { AuthService } from "../../../core/services/auth.service";
+import { TestBed } from "@angular/core/testing";
+import { HttpClientTestingModule } from "@angular/common/http/testing";
 ```
 
 ### 2. Mock Services for Testing
@@ -304,19 +328,21 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 const mockAuthService = {
   user: signal(null),
   authStatus$: () => of(false),
-  signIn: jasmine.createSpy('signIn').and.returnValue(Promise.resolve(true))
+  signIn: jasmine.createSpy("signIn").and.returnValue(Promise.resolve(true)),
 };
 ```
 
 ## ⚠️ Breaking Changes
 
 ### 1. Import Path Changes
+
 All import paths will change. Use global find/replace:
 
 - `../services/auth.service` → `../../../core/services/auth.service`
 - `../models/portfolio.model` → `../models/portfolio.model` or `../../../shared/models/`
 
 ### 2. Service Registration Changes
+
 Services now registered in feature modules instead of root:
 
 ```typescript
@@ -328,25 +354,28 @@ Services now registered in feature modules instead of root:
 ```
 
 ### 3. Component Module Dependencies
+
 Components now depend on SharedModule:
 
 ```typescript
 // Old
-imports: [CommonModule, FormsModule, RouterModule]
+imports: [CommonModule, FormsModule, RouterModule];
 
 // New
-imports: [SharedModule] // Includes CommonModule, FormsModule, RouterModule
+imports: [SharedModule]; // Includes CommonModule, FormsModule, RouterModule
 ```
 
 ## 📝 Step-by-Step Migration Process
 
 ### Step 1: Setup New Structure (✅ Complete)
+
 1. Create core, shared, and features directories
 2. Move and refactor auth service
 3. Create new guards and interceptors
 4. Create shared components and utilities
 
 ### Step 2: Migrate Portfolio Feature (🔄 In Progress)
+
 1. ✅ Create portfolio feature module structure
 2. ✅ Create portfolio models and DTOs
 3. ✅ Create portfolio service with clean architecture
@@ -356,18 +385,21 @@ imports: [SharedModule] // Includes CommonModule, FormsModule, RouterModule
 7. ⏳ Test portfolio feature functionality
 
 ### Step 3: Migrate Stock Feature (⏳ Pending)
+
 1. Create stock feature module
 2. Move stock-related components
 3. Move stock services
 4. Update imports and dependencies
 
 ### Step 4: Migrate Auth Feature (⏳ Pending)
+
 1. Create auth feature module
 2. Move login component
 3. Create auth routing
 4. Update auth-related dependencies
 
 ### Step 5: Final Integration (⏳ Pending)
+
 1. Update main app module
 2. Update main.ts
 3. Test all routes and lazy loading

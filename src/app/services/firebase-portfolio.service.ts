@@ -375,7 +375,9 @@ export class FirebasePortfolioService {
     const portfolio = this.getPortfolio(portfolioId);
     if (!portfolio) return false;
 
-    const stock = portfolio.stocks.find((s) => s.ticker.toUpperCase() === stockTicker.toUpperCase());
+    const stock = portfolio.stocks.find(
+      (s) => s.ticker.toUpperCase() === stockTicker.toUpperCase(),
+    );
     if (!stock) return false;
 
     // Update market data

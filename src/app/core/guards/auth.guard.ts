@@ -1,7 +1,13 @@
 import { inject } from "@angular/core";
-import { CanActivateFn, Router, UrlTree, ActivatedRouteSnapshot, RouterStateSnapshot } from "@angular/router";
+import {
+  CanActivateFn,
+  Router,
+  UrlTree,
+  ActivatedRouteSnapshot,
+  RouterStateSnapshot,
+} from "@angular/router";
 import { Observable } from "rxjs";
-import { map, take } from 'rxjs/operators';
+import { map, take } from "rxjs/operators";
 
 import { AuthService } from "../services/auth.service";
 import { LoggerService } from "../services/logger.service";
@@ -23,17 +29,22 @@ export const AuthGuard: CanActivateFn = (
     take(1),
     map((isAuthenticated: boolean) => {
       if (isAuthenticated) {
-        logger.debug("Auth guard: User authenticated, allowing access", { route: state.url });
+        logger.debug("Auth guard: User authenticated, allowing access", {
+          route: state.url,
+        });
         return true;
       } else {
-        logger.info("Auth guard: User not authenticated, redirecting to login", { 
-          attemptedRoute: state.url 
-        });
-        
+        logger.info(
+          "Auth guard: User not authenticated, redirecting to login",
+          {
+            attemptedRoute: state.url,
+          },
+        );
+
         // Store the attempted URL for redirect after login
         const returnUrl = state.url;
-        return router.createUrlTree([APP_CONSTANTS.ROUTES.LOGIN], { 
-          queryParams: { returnUrl } 
+        return router.createUrlTree([APP_CONSTANTS.ROUTES.LOGIN], {
+          queryParams: { returnUrl },
         });
       }
     }),

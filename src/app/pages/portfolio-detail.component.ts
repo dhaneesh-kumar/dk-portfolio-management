@@ -3,7 +3,10 @@ import { CommonModule } from "@angular/common";
 import { RouterModule, ActivatedRoute, Router } from "@angular/router";
 import { FormsModule } from "@angular/forms";
 import { FirebasePortfolioService } from "../services/firebase-portfolio.service";
-import { StockApiService, StockSearchResult } from "../services/stock-api.service";
+import {
+  StockApiService,
+  StockSearchResult,
+} from "../services/stock-api.service";
 import { Portfolio, Stock } from "../models/portfolio.model";
 import { PortfolioChartComponent } from "../components/portfolio-chart.component";
 import { StockSearchComponent } from "../components/stock-search.component";
@@ -11,7 +14,13 @@ import { StockSearchComponent } from "../components/stock-search.component";
 @Component({
   selector: "app-portfolio-detail",
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, PortfolioChartComponent, StockSearchComponent],
+  imports: [
+    CommonModule,
+    RouterModule,
+    FormsModule,
+    PortfolioChartComponent,
+    StockSearchComponent,
+  ],
   template: `
     @if (portfolio()) {
       <div class="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
@@ -423,20 +432,35 @@ import { StockSearchComponent } from "../components/stock-search.component";
                 </div>
 
                 @if (selectedStock()) {
-                  <div class="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                  <div
+                    class="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg"
+                  >
                     <div class="flex items-center gap-3">
                       <div class="flex-1">
-                        <div class="font-medium text-slate-900">{{ selectedStock()!.symbol }}</div>
-                        <div class="text-sm text-slate-600">{{ selectedStock()!.name }}</div>
+                        <div class="font-medium text-slate-900">
+                          {{ selectedStock()!.symbol }}
+                        </div>
+                        <div class="text-sm text-slate-600">
+                          {{ selectedStock()!.name }}
+                        </div>
                       </div>
                       @if (stockQuote()) {
                         <div class="text-right">
-                          <div class="font-bold text-slate-900">₹{{ stockQuote()!.price | number: "1.2-2" }}</div>
+                          <div class="font-bold text-slate-900">
+                            ₹{{ stockQuote()!.price | number: "1.2-2" }}
+                          </div>
                           <div
                             class="text-sm"
-                            [class]="stockQuote()!.changePercent >= 0 ? 'text-green-600' : 'text-red-600'"
+                            [class]="
+                              stockQuote()!.changePercent >= 0
+                                ? 'text-green-600'
+                                : 'text-red-600'
+                            "
                           >
-                            {{ stockQuote()!.changePercent >= 0 ? "+" : "" }}{{ stockQuote()!.changePercent | number: "1.2-2" }}%
+                            {{ stockQuote()!.changePercent >= 0 ? "+" : ""
+                            }}{{
+                              stockQuote()!.changePercent | number: "1.2-2"
+                            }}%
                           </div>
                         </div>
                       }
@@ -473,7 +497,11 @@ import { StockSearchComponent } from "../components/stock-search.component";
                         min="0.01"
                         step="0.01"
                         class="w-full px-3 py-2 pr-20 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                        [placeholder]="stockQuote()?.price ? stockQuote()!.price.toString() : '2450.50'"
+                        [placeholder]="
+                          stockQuote()?.price
+                            ? stockQuote()!.price.toString()
+                            : '2450.50'
+                        "
                       />
                       @if (stockQuote() && !newStock.currentPrice) {
                         <button
@@ -663,8 +691,8 @@ export class PortfolioDetailComponent {
         }
       },
       error: (error) => {
-        console.error('Failed to fetch stock quote:', error);
-      }
+        console.error("Failed to fetch stock quote:", error);
+      },
     });
   }
 
@@ -683,13 +711,13 @@ export class PortfolioDetailComponent {
           await this.portfolioService.updateStockMarketData(
             this.portfolioId(),
             symbol,
-            marketData
+            marketData,
           );
         }
       },
       error: (error) => {
-        console.error('Failed to update market data:', error);
-      }
+        console.error("Failed to update market data:", error);
+      },
     });
   }
 }

@@ -1,9 +1,9 @@
-import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { Injectable } from "@angular/core";
+import { BehaviorSubject, Observable } from "rxjs";
 
 export interface Notification {
   id: string;
-  type: 'success' | 'error' | 'warning' | 'info';
+  type: "success" | "error" | "warning" | "info";
   title: string;
   message: string;
   duration?: number;
@@ -16,7 +16,7 @@ export interface NotificationAction {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: "root",
 })
 export class NotificationService {
   private notifications$ = new BehaviorSubject<Notification[]>([]);
@@ -28,44 +28,44 @@ export class NotificationService {
 
   success(title: string, message: string, duration?: number): void {
     this.addNotification({
-      type: 'success',
+      type: "success",
       title,
       message,
-      duration
+      duration,
     });
   }
 
   error(title: string, message: string, duration?: number): void {
     this.addNotification({
-      type: 'error',
+      type: "error",
       title,
       message,
-      duration: duration || 0 // Error notifications don't auto-dismiss by default
+      duration: duration || 0, // Error notifications don't auto-dismiss by default
     });
   }
 
   warning(title: string, message: string, duration?: number): void {
     this.addNotification({
-      type: 'warning',
+      type: "warning",
       title,
       message,
-      duration
+      duration,
     });
   }
 
   info(title: string, message: string, duration?: number): void {
     this.addNotification({
-      type: 'info',
+      type: "info",
       title,
       message,
-      duration
+      duration,
     });
   }
 
   remove(id: string): void {
     const currentNotifications = this.notifications$.value;
     this.notifications$.next(
-      currentNotifications.filter(notification => notification.id !== id)
+      currentNotifications.filter((notification) => notification.id !== id),
     );
   }
 
@@ -73,12 +73,12 @@ export class NotificationService {
     this.notifications$.next([]);
   }
 
-  private addNotification(notification: Omit<Notification, 'id'>): void {
+  private addNotification(notification: Omit<Notification, "id">): void {
     const id = this.generateId();
     const fullNotification: Notification = {
       ...notification,
       id,
-      duration: notification.duration ?? this.defaultDuration
+      duration: notification.duration ?? this.defaultDuration,
     };
 
     const currentNotifications = this.notifications$.value;

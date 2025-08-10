@@ -1,18 +1,20 @@
-import { Injectable } from '@angular/core';
-import { environment } from '../../../environments/environment';
+import { Injectable } from "@angular/core";
+import { environment } from "../../../environments/environment";
 
 export enum LogLevel {
   DEBUG = 0,
   INFO = 1,
   WARN = 2,
-  ERROR = 3
+  ERROR = 3,
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: "root",
 })
 export class LoggerService {
-  private currentLogLevel: LogLevel = environment.production ? LogLevel.WARN : LogLevel.DEBUG;
+  private currentLogLevel: LogLevel = environment.production
+    ? LogLevel.WARN
+    : LogLevel.DEBUG;
 
   debug(message: string, ...optionalParams: any[]): void {
     this.log(LogLevel.DEBUG, message, optionalParams);

@@ -542,18 +542,18 @@ export class StockDetailComponent {
             await this.portfolioService.updateStockMarketData(
               this.portfolioId(),
               currentStock.ticker,
-              marketData
+              marketData,
             );
           }
           this.isLoadingMarketData.set(false);
         },
         error: (error) => {
-          console.error('Failed to fetch market data:', error);
+          console.error("Failed to fetch market data:", error);
           this.isLoadingMarketData.set(false);
-        }
+        },
       });
     } catch (error) {
-      console.error('Error fetching market data:', error);
+      console.error("Error fetching market data:", error);
       this.isLoadingMarketData.set(false);
     }
   }

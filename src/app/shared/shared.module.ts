@@ -1,24 +1,24 @@
-import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
+import { NgModule } from "@angular/core";
+import { CommonModule } from "@angular/common";
+import { FormsModule, ReactiveFormsModule } from "@angular/forms";
+import { RouterModule } from "@angular/router";
 
 // Shared Components
-import { LoadingSpinnerComponent } from './components/loading-spinner/loading-spinner.component';
-import { ConfirmDialogComponent } from './components/confirm-dialog/confirm-dialog.component';
-import { NotificationToastComponent } from './components/notification-toast/notification-toast.component';
-import { ErrorMessageComponent } from './components/error-message/error-message.component';
-import { EmptyStateComponent } from './components/empty-state/empty-state.component';
+import { LoadingSpinnerComponent } from "./components/loading-spinner/loading-spinner.component";
+import { ConfirmDialogComponent } from "./components/confirm-dialog/confirm-dialog.component";
+import { NotificationToastComponent } from "./components/notification-toast/notification-toast.component";
+import { ErrorMessageComponent } from "./components/error-message/error-message.component";
+import { EmptyStateComponent } from "./components/empty-state/empty-state.component";
 
 // Shared Directives
-import { ClickOutsideDirective } from './directives/click-outside.directive';
-import { HighlightDirective } from './directives/highlight.directive';
+import { ClickOutsideDirective } from "./directives/click-outside.directive";
+import { HighlightDirective } from "./directives/highlight.directive";
 
 // Shared Pipes
-import { CurrencyFormatPipe } from './pipes/currency-format.pipe';
-import { PercentageFormatPipe } from './pipes/percentage-format.pipe';
-import { TimeAgoPipe } from './pipes/time-ago.pipe';
-import { TruncatePipe } from './pipes/truncate.pipe';
+import { CurrencyFormatPipe } from "./pipes/currency-format.pipe";
+import { PercentageFormatPipe } from "./pipes/percentage-format.pipe";
+import { TimeAgoPipe } from "./pipes/time-ago.pipe";
+import { TruncatePipe } from "./pipes/truncate.pipe";
 
 const SHARED_COMPONENTS = [
   LoadingSpinnerComponent,
@@ -28,10 +28,7 @@ const SHARED_COMPONENTS = [
   EmptyStateComponent,
 ];
 
-const SHARED_DIRECTIVES = [
-  ClickOutsideDirective,
-  HighlightDirective,
-];
+const SHARED_DIRECTIVES = [ClickOutsideDirective, HighlightDirective];
 
 const SHARED_PIPES = [
   CurrencyFormatPipe,
@@ -48,22 +45,16 @@ const ANGULAR_MODULES = [
 ];
 
 @NgModule({
-  declarations: [
-    ...SHARED_COMPONENTS,
-    ...SHARED_DIRECTIVES,
-    ...SHARED_PIPES,
-  ],
-  imports: [
-    ...ANGULAR_MODULES,
-  ],
+  declarations: [...SHARED_COMPONENTS, ...SHARED_DIRECTIVES, ...SHARED_PIPES],
+  imports: [...ANGULAR_MODULES],
   exports: [
     // Angular modules
     ...ANGULAR_MODULES,
-    
+
     // Shared components, directives, and pipes
     ...SHARED_COMPONENTS,
     ...SHARED_DIRECTIVES,
     ...SHARED_PIPES,
-  ]
+  ],
 })
-export class SharedModule { }
+export class SharedModule {}

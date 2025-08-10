@@ -12,14 +12,14 @@ export class MarketDataService {
   private stockApiService = inject(StockApiService);
   private portfolioService = inject(FirebasePortfolioService);
   private authService = inject(AuthService);
-  
+
   private destroy$ = new Subject<void>();
   private isRefreshing = signal(false);
   private lastRefresh = signal<Date | null>(null);
-  
+
   // Refresh interval in milliseconds (5 minutes)
   private readonly REFRESH_INTERVAL = 5 * 60 * 1000;
-  
+
   constructor() {
     this.startPeriodicRefresh();
   }
@@ -52,7 +52,7 @@ export class MarketDataService {
             return this.refreshAllPortfolioData();
           }
           return [];
-        })
+        }),
       )
       .subscribe();
   }
@@ -66,7 +66,7 @@ export class MarketDataService {
     }
 
     this.isRefreshing.set(true);
-    
+
     try {
       const portfolios = this.portfolioService.getPortfolios()();
       const promises: Promise<boolean>[] = [];
@@ -78,12 +78,12 @@ export class MarketDataService {
       }
 
       const results = await Promise.all(promises);
-      const success = results.every(result => result);
-      
+      const success = results.every((result) => result);
+
       if (success) {
         this.lastRefresh.set(new Date());
       }
-      
+
       return success;
     } catch (error) {
       console.error("Error refreshing portfolio data:", error);
@@ -104,11 +104,13 @@ export class MarketDataService {
 
     try {
       // Get unique stock tickers
-      const tickers = [...new Set(portfolio.stocks.map(stock => stock.ticker))];
-      
+      const tickers = [
+        ...new Set(portfolio.stocks.map((stock) => stock.ticker)),
+      ];
+
       // Fetch quotes for all stocks in parallel
-      const quotes$ = tickers.map(ticker => 
-        this.stockApiService.getStockQuote(ticker)
+      const quotes$ = tickers.map((ticker) =>
+        this.stockApiService.getStockQuote(ticker),
       );
 
       return new Promise((resolve) => {
@@ -119,15 +121,17 @@ export class MarketDataService {
             quotes.forEach((quote, index) => {
               if (quote) {
                 const ticker = tickers[index];
-                marketDataMap[ticker.toUpperCase()] = this.stockApiService.convertToMarketData(quote);
+                marketDataMap[ticker.toUpperCase()] =
+                  this.stockApiService.convertToMarketData(quote);
               }
             });
 
             if (Object.keys(marketDataMap).length > 0) {
-              const success = await this.portfolioService.updateAllStocksMarketData(
-                portfolioId,
-                marketDataMap
-              );
+              const success =
+                await this.portfolioService.updateAllStocksMarketData(
+                  portfolioId,
+                  marketDataMap,
+                );
               resolve(success);
             } else {
               // Even if no new data, consider it a successful refresh
@@ -135,10 +139,13 @@ export class MarketDataService {
             }
           },
           error: (error) => {
-            console.warn(`API unavailable for portfolio ${portfolioId}, using fallback data:`, error.message);
+            console.warn(
+              `API unavailable for portfolio ${portfolioId}, using fallback data:`,
+              error.message,
+            );
             // Don't fail completely, just resolve as successful
             resolve(true);
-          }
+          },
         });
       });
     } catch (error) {
@@ -150,17 +157,21 @@ export class MarketDataService {
   /**
    * Refresh market data for a specific stock
    */
-  async refreshStockData(portfolioId: string, stockTicker: string): Promise<boolean> {
+  async refreshStockData(
+    portfolioId: string,
+    stockTicker: string,
+  ): Promise<boolean> {
     try {
       return new Promise((resolve) => {
         this.stockApiService.getStockQuote(stockTicker).subscribe({
           next: async (quote) => {
             if (quote) {
-              const marketData = this.stockApiService.convertToMarketData(quote);
+              const marketData =
+                this.stockApiService.convertToMarketData(quote);
               const success = await this.portfolioService.updateStockMarketData(
                 portfolioId,
                 stockTicker,
-                marketData
+                marketData,
               );
               resolve(success);
             } else {
@@ -169,10 +180,13 @@ export class MarketDataService {
             }
           },
           error: (error) => {
-            console.warn(`API unavailable for stock ${stockTicker}, using fallback data:`, error.message);
+            console.warn(
+              `API unavailable for stock ${stockTicker}, using fallback data:`,
+              error.message,
+            );
             // Don't fail completely, just resolve as successful
             resolve(true);
-          }
+          },
         });
       });
     } catch (error) {
@@ -188,23 +202,25 @@ export class MarketDataService {
     const now = new Date();
     const istOffset = 5.5 * 60 * 60 * 1000; // IST is UTC+5:30
     const istTime = new Date(now.getTime() + istOffset);
-    
+
     const day = istTime.getDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
     const hours = istTime.getHours();
     const minutes = istTime.getMinutes();
     const currentTimeMinutes = hours * 60 + minutes;
-    
+
     // Market hours: Monday to Friday, 9:15 AM to 3:30 PM IST
     const marketOpenMinutes = 9 * 60 + 15; // 9:15 AM
     const marketCloseMinutes = 15 * 60 + 30; // 3:30 PM
-    
+
     const isWeekday = day >= 1 && day <= 5;
-    const isMarketHours = currentTimeMinutes >= marketOpenMinutes && currentTimeMinutes <= marketCloseMinutes;
-    
+    const isMarketHours =
+      currentTimeMinutes >= marketOpenMinutes &&
+      currentTimeMinutes <= marketCloseMinutes;
+
     if (isWeekday && isMarketHours) {
       return {
         isOpen: true,
-        message: "Market is currently open"
+        message: "Market is currently open",
       };
     } else if (isWeekday && currentTimeMinutes < marketOpenMinutes) {
       // Market will open today
@@ -213,27 +229,30 @@ export class MarketDataService {
       return {
         isOpen: false,
         nextOpenTime: nextOpen,
-        message: "Market opens at 9:15 AM IST"
+        message: "Market opens at 9:15 AM IST",
       };
     } else {
       // Market is closed, calculate next opening day
       let daysUntilOpen = 1;
       let nextDay = (day + 1) % 7;
-      
-      while (nextDay === 0 || nextDay === 6) { // Skip weekends
+
+      while (nextDay === 0 || nextDay === 6) {
+        // Skip weekends
         daysUntilOpen++;
         nextDay = (nextDay + 1) % 7;
       }
-      
+
       const nextOpen = new Date(istTime);
       nextOpen.setDate(nextOpen.getDate() + daysUntilOpen);
       nextOpen.setHours(9, 15, 0, 0);
-      
+
       return {
         isOpen: false,
         nextOpenTime: nextOpen,
-        message: daysUntilOpen === 1 ? "Market opens tomorrow at 9:15 AM IST" : 
-                 `Market opens on ${nextOpen.toLocaleDateString('en-IN', { weekday: 'long' })} at 9:15 AM IST`
+        message:
+          daysUntilOpen === 1
+            ? "Market opens tomorrow at 9:15 AM IST"
+            : `Market opens on ${nextOpen.toLocaleDateString("en-IN", { weekday: "long" })} at 9:15 AM IST`,
       };
     }
   }

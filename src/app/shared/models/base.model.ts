@@ -33,7 +33,7 @@ export interface PaginationParams {
   page: number;
   limit: number;
   sortBy?: string;
-  sortOrder?: 'asc' | 'desc';
+  sortOrder?: "asc" | "desc";
 }
 
 export interface PaginatedResponse<T> extends ApiResponse<T[]> {
@@ -77,7 +77,7 @@ export interface AsyncState<T = any> extends LoadingState, ErrorState {
  */
 export interface Filter {
   field: string;
-  operator: 'eq' | 'ne' | 'gt' | 'gte' | 'lt' | 'lte' | 'in' | 'contains';
+  operator: "eq" | "ne" | "gt" | "gte" | "lt" | "lte" | "in" | "contains";
   value: any;
 }
 

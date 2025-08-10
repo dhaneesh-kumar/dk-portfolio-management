@@ -48,29 +48,35 @@ src/app/
 ### 2. SOLID Principles Implementation
 
 #### Single Responsibility Principle
+
 - Each service has one responsibility (AuthService for auth, PortfolioService for portfolio logic)
 - Components handle only view logic
 - Services handle only business logic
 
 #### Open/Closed Principle
+
 - Services use interfaces for extensibility
 - Components can be extended without modification
 
 #### Liskov Substitution Principle
+
 - All services implement clear contracts
 - Mock services can replace real services for testing
 
 #### Interface Segregation Principle
+
 - Specific interfaces for different concerns (User, Portfolio, Stock)
 - No fat interfaces with unused methods
 
 #### Dependency Inversion Principle
+
 - Components depend on abstractions (services), not concrete implementations
 - Dependency injection used throughout
 
 ### 3. Clean Code Practices
 
 #### Naming Conventions
+
 - **Components**: PascalCase with `.component.ts` suffix
 - **Services**: PascalCase with `.service.ts` suffix
 - **Models**: PascalCase with `.model.ts` suffix
@@ -78,6 +84,7 @@ src/app/
 - **Variables/Functions**: camelCase
 
 #### File Organization
+
 - Related files grouped in folders
 - Clear separation between different types of files
 - Consistent naming patterns
@@ -85,52 +92,62 @@ src/app/
 ## 🔧 Core Module
 
 ### Purpose
+
 Contains singleton services, guards, and interceptors that should be loaded only once.
 
 ### Key Components
 
 #### Services
+
 - **AuthService**: Authentication and user management
 - **LoggerService**: Application logging with different levels
 - **NotificationService**: User notifications and messages
 - **LoadingService**: Global loading state management
 
 #### Guards
+
 - **AuthGuard**: Protects authenticated routes
 - **GuestGuard**: Protects guest-only routes (login, signup)
 
 #### Interceptors
+
 - **ErrorInterceptor**: Global error handling
 - **LoadingInterceptor**: Automatic loading indicators
 
 #### Constants
+
 - **APP_CONSTANTS**: Application-wide configuration
 - **AUTH_ERROR_MESSAGES**: Authentication error mappings
 
 ## 🔄 Shared Module
 
 ### Purpose
+
 Contains reusable components, pipes, and directives used across features.
 
 ### Key Components
 
 #### Components
+
 - **LoadingSpinnerComponent**: Configurable loading spinner
 - **NotificationToastComponent**: Toast notifications
 - **HeaderComponent**: Application header with navigation
 - **ConfirmDialogComponent**: Confirmation dialogs
 
 #### Pipes
+
 - **CurrencyFormatPipe**: Format currency values (INR support)
 - **PercentageFormatPipe**: Format percentage values
 - **TimeAgoPipe**: Relative time formatting
 - **TruncatePipe**: Text truncation
 
 #### Directives
+
 - **ClickOutsideDirective**: Handle outside clicks
 - **HighlightDirective**: Text highlighting
 
 #### Models
+
 - **BaseEntity**: Common entity interface
 - **ApiResponse**: Standard API response interface
 - **AsyncState**: Loading/error state interface
@@ -140,6 +157,7 @@ Contains reusable components, pipes, and directives used across features.
 ### Portfolio Module
 
 #### Components
+
 - **PortfolioListComponent**: Display user portfolios
 - **PortfolioDetailComponent**: Portfolio details and management
 - **PortfolioFormComponent**: Create/edit portfolio forms
@@ -147,12 +165,14 @@ Contains reusable components, pipes, and directives used across features.
 - **SharePortfolioComponent**: Portfolio sharing functionality
 
 #### Services
+
 - **PortfolioService**: Main portfolio business logic
 - **PortfolioDataService**: Data access layer
 - **PortfolioCalculationService**: Portfolio calculations
 - **PortfolioShareService**: Sharing functionality
 
 #### Models
+
 - **Portfolio**: Main portfolio interface
 - **Stock**: Stock entity interface
 - **MarketData**: Market data interface
@@ -161,6 +181,7 @@ Contains reusable components, pipes, and directives used across features.
 ## 📊 State Management
 
 ### Reactive State with Signals
+
 ```typescript
 // Service level state management
 private readonly _portfoliosState = signal<AsyncState<Portfolio[]>>({
@@ -175,6 +196,7 @@ readonly isLoading = computed(() => this._portfoliosState().isLoading);
 ```
 
 ### Observable Patterns
+
 ```typescript
 // BehaviorSubject for shared state
 private readonly portfoliosSubject = new BehaviorSubject<Portfolio[]>([]);
@@ -184,11 +206,13 @@ readonly portfolios$ = this.portfoliosSubject.asObservable();
 ## 🔒 Error Handling
 
 ### Global Error Handling
+
 - **ErrorInterceptor**: Catches all HTTP errors
 - **LoggerService**: Structured logging with different levels
 - **NotificationService**: User-friendly error messages
 
 ### Component Level Error Handling
+
 ```typescript
 private handleError(message: string, error: Error): void {
   this.logger.error(message, error);
@@ -204,15 +228,18 @@ private handleError(message: string, error: Error): void {
 ## 🧪 Testing Strategy
 
 ### Unit Testing
+
 - Each service has corresponding `.spec.ts` file
 - Components tested in isolation
 - Mock services for dependencies
 
 ### Integration Testing
+
 - Feature modules tested as units
 - End-to-end critical user journeys
 
 ### Testing Utilities
+
 ```typescript
 // Mock services
 class MockAuthService {
@@ -224,10 +251,12 @@ class MockAuthService {
 ## 🚀 Performance Optimizations
 
 ### Lazy Loading
+
 - Feature modules loaded on demand
 - Reduced initial bundle size
 
 ### OnPush Change Detection
+
 ```typescript
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -235,29 +264,34 @@ class MockAuthService {
 ```
 
 ### Reactive Programming
+
 - RxJS operators for efficient data flow
 - Signals for reactive state management
 
 ## 📋 Best Practices Implemented
 
 ### 1. TypeScript Best Practices
+
 - Strict typing enabled
 - Interfaces for all data structures
 - Generic types where appropriate
 
 ### 2. Angular Best Practices
+
 - OnPush change detection strategy
 - Reactive forms
 - Route guards for protection
 - Lazy loading for performance
 
 ### 3. Code Quality
+
 - ESLint and Prettier configuration
 - Consistent code formatting
 - Comprehensive commenting
 - Clear naming conventions
 
 ### 4. Security
+
 - XSS protection
 - CSRF protection
 - Route guards
@@ -266,6 +300,7 @@ class MockAuthService {
 ## 🔧 Development Workflow
 
 ### Adding a New Feature
+
 1. Create feature module in `features/`
 2. Define models in `models/`
 3. Create data service for API communication
@@ -275,11 +310,13 @@ class MockAuthService {
 7. Add unit tests
 
 ### Adding Shared Functionality
+
 1. Create component/pipe/directive in `shared/`
 2. Export from `shared.module.ts`
 3. Import `SharedModule` where needed
 
 ### Adding Core Functionality
+
 1. Create service in `core/services/`
 2. Add to `core.module.ts` providers
 3. Use dependency injection
@@ -287,16 +324,19 @@ class MockAuthService {
 ## �� Scalability Considerations
 
 ### Horizontal Scaling
+
 - Feature modules can be developed independently
 - Clear separation of concerns
 - Lazy loading for performance
 
 ### Vertical Scaling
+
 - Services can be extended without breaking existing code
 - Clear interfaces for contract definition
 - Mock services for testing
 
 ### Team Scaling
+
 - Clear ownership boundaries (feature modules)
 - Consistent patterns across features
 - Shared components reduce duplication

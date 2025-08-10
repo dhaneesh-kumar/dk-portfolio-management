@@ -14,7 +14,7 @@ export interface UserProfile extends User {
 }
 
 export interface UserPreferences {
-  theme: 'light' | 'dark' | 'auto';
+  theme: "light" | "dark" | "auto";
   currency: string;
   language: string;
   notifications: NotificationPreferences;
@@ -30,21 +30,21 @@ export interface NotificationPreferences {
 }
 
 export interface DashboardPreferences {
-  defaultView: 'grid' | 'list';
+  defaultView: "grid" | "list";
   chartsVisible: boolean;
   refreshInterval: number;
   compactMode: boolean;
 }
 
 export interface UserSubscription {
-  plan: 'free' | 'premium' | 'pro';
-  status: 'active' | 'cancelled' | 'expired';
+  plan: "free" | "premium" | "pro";
+  status: "active" | "cancelled" | "expired";
   startDate: Date;
   endDate?: Date;
   features: string[];
 }
 
-export type UserRole = 'user' | 'admin' | 'moderator';
+export type UserRole = "user" | "admin" | "moderator";
 
 export interface UserPermissions {
   canCreatePortfolios: boolean;

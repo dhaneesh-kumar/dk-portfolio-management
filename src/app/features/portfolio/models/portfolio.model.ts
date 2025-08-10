@@ -1,4 +1,4 @@
-import { BaseEntity, OwnedEntity } from '../../../shared/models/base.model';
+import { BaseEntity, OwnedEntity } from "../../../shared/models/base.model";
 
 export interface Portfolio extends OwnedEntity {
   name: string;
@@ -156,17 +156,37 @@ export interface RebalanceRecommendation {
   currentWeight: number;
   targetWeight: number;
   difference: number;
-  action: 'buy' | 'sell' | 'hold';
+  action: "buy" | "sell" | "hold";
   recommendedShares: number;
   estimatedCost: number;
 }
 
 // Enums and Types
-export type PortfolioType = 'equity' | 'debt' | 'hybrid' | 'index' | 'custom';
-export type RiskLevel = 'conservative' | 'moderate' | 'aggressive' | 'very_aggressive';
-export type RebalanceFrequency = 'monthly' | 'quarterly' | 'semi_annual' | 'annual' | 'manual';
-export type DividendFrequency = 'monthly' | 'quarterly' | 'semi_annual' | 'annual' | 'special';
-export type TransactionType = 'buy' | 'sell' | 'dividend' | 'split' | 'bonus' | 'rights';
+export type PortfolioType = "equity" | "debt" | "hybrid" | "index" | "custom";
+export type RiskLevel =
+  | "conservative"
+  | "moderate"
+  | "aggressive"
+  | "very_aggressive";
+export type RebalanceFrequency =
+  | "monthly"
+  | "quarterly"
+  | "semi_annual"
+  | "annual"
+  | "manual";
+export type DividendFrequency =
+  | "monthly"
+  | "quarterly"
+  | "semi_annual"
+  | "annual"
+  | "special";
+export type TransactionType =
+  | "buy"
+  | "sell"
+  | "dividend"
+  | "split"
+  | "bonus"
+  | "rights";
 
 // DTOs for API communication
 export interface CreatePortfolioDto {

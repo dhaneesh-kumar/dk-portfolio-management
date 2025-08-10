@@ -1,8 +1,8 @@
-import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { Injectable } from "@angular/core";
+import { BehaviorSubject, Observable } from "rxjs";
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: "root",
 })
 export class LoadingService {
   private loadingSubject = new BehaviorSubject<boolean>(false);
@@ -31,7 +31,7 @@ export class LoadingService {
     } else {
       this.loadingMap.delete(key);
     }
-    
+
     // Update global loading state based on any active loading states
     this.loadingSubject.next(this.loadingMap.size > 0);
   }

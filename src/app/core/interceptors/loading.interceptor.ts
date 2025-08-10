@@ -1,9 +1,14 @@
-import { Injectable } from '@angular/core';
-import { HttpInterceptor, HttpRequest, HttpHandler, HttpEvent } from '@angular/common/http';
-import { Observable } from 'rxjs';
-import { finalize } from 'rxjs/operators';
+import { Injectable } from "@angular/core";
+import {
+  HttpInterceptor,
+  HttpRequest,
+  HttpHandler,
+  HttpEvent,
+} from "@angular/common/http";
+import { Observable } from "rxjs";
+import { finalize } from "rxjs/operators";
 
-import { LoadingService } from '../services/loading.service';
+import { LoadingService } from "../services/loading.service";
 
 @Injectable()
 export class LoadingInterceptor implements HttpInterceptor {
@@ -11,7 +16,10 @@ export class LoadingInterceptor implements HttpInterceptor {
 
   constructor(private loadingService: LoadingService) {}
 
-  intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+  intercept(
+    request: HttpRequest<any>,
+    next: HttpHandler,
+  ): Observable<HttpEvent<any>> {
     // Skip loading indicator for specific requests
     if (this.shouldSkipLoading(request)) {
       return next.handle(request);
@@ -28,23 +36,23 @@ export class LoadingInterceptor implements HttpInterceptor {
         if (this.activeRequests === 0) {
           this.loadingService.setLoading(false);
         }
-      })
+      }),
     );
   }
 
   private shouldSkipLoading(request: HttpRequest<any>): boolean {
     // Skip loading for requests with specific headers
-    if (request.headers.has('Skip-Loading')) {
+    if (request.headers.has("Skip-Loading")) {
       return true;
     }
 
     // Skip loading for polling requests or real-time updates
-    if (request.url.includes('/ping') || request.url.includes('/health')) {
+    if (request.url.includes("/ping") || request.url.includes("/health")) {
       return true;
     }
 
     // Skip loading for background data refresh
-    if (request.headers.has('Background-Request')) {
+    if (request.headers.has("Background-Request")) {
       return true;
     }
 
