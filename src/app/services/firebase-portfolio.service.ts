@@ -135,6 +135,9 @@ export class FirebasePortfolioService {
         return null;
       }
 
+      const user = this.authService.getUser()();
+      if (!user) return null;
+
       const portfolioData = {
         name,
         description,
@@ -142,9 +145,12 @@ export class FirebasePortfolioService {
         totalValue: 0,
         totalReturn: 0,
         totalReturnPercent: 0,
+        ownerId: user.uid,
+        ownerEmail: user.email,
         createdAt: Timestamp.now(),
         updatedAt: Timestamp.now(),
         isTemplate: false,
+        comments: []
       };
 
       const docRef = await addDoc(collection(db, "portfolios"), portfolioData);
