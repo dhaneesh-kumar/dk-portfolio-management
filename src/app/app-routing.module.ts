@@ -55,29 +55,6 @@ const routes: Routes = [
     },
   },
 
-  // Stock routes
-  {
-    path: "stock",
-    loadChildren: () =>
-      import("./features/stock/stock.module").then((m) => m.StockModule),
-    canActivate: [AuthGuard],
-    data: {
-      title: "Stocks",
-      breadcrumb: "Stocks",
-    },
-  },
-
-  // Profile and settings
-  {
-    path: "profile",
-    loadChildren: () =>
-      import("./features/profile/profile.module").then((m) => m.ProfileModule),
-    canActivate: [AuthGuard],
-    data: {
-      title: "Profile",
-      breadcrumb: "Profile",
-    },
-  },
 
   // Wildcard route - must be last
   {
