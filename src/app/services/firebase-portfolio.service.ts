@@ -66,7 +66,7 @@ export class FirebasePortfolioService {
       // Check if Firebase is configured
       if (!db) {
         this.error.set("Firebase not configured. Using sample data.");
-        this.initializeSampleData();
+        // this.initializeSampleData();
         return;
       }
 
@@ -121,7 +121,7 @@ export class FirebasePortfolioService {
         "Failed to load portfolios. Please check your Firebase configuration.",
       );
       // Fallback to sample data if Firebase fails
-      this.initializeSampleData();
+      // this.initializeSampleData();
     } finally {
       this.loading.set(false);
     }
