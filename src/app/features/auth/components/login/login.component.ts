@@ -93,7 +93,7 @@ import { LoadingSpinnerComponent } from '../../../../shared/components/loading-s
                   class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-md font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   @if (authService.isLoading()) {
-                    <app-loading-spinner size="sm" color="white" showText="false"></app-loading-spinner>
+                    <app-loading-spinner size="sm" color="white" [showText]="false"></app-loading-spinner>
                   } @else {
                     Sign In
                   }
@@ -156,7 +156,7 @@ import { LoadingSpinnerComponent } from '../../../../shared/components/loading-s
                   class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-md font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   @if (authService.isLoading()) {
-                    <app-loading-spinner size="sm" color="white" showText="false"></app-loading-spinner>
+                    <app-loading-spinner size="sm" color="white" [showText]="false"></app-loading-spinner>
                   } @else {
                     Create Account
                   }
