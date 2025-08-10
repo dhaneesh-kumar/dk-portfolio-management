@@ -179,7 +179,13 @@ export class FirebasePortfolioService {
     try {
       this.loading.set(true);
       this.error.set(null);
-      
+
+      // Check if Firebase is configured
+      if (!db) {
+        this.error.set('Firebase not configured. Cannot delete data.');
+        return false;
+      }
+
       await deleteDoc(doc(db, 'portfolios', id));
       this.portfolios.update(portfolios => portfolios.filter(p => p.id !== id));
       
