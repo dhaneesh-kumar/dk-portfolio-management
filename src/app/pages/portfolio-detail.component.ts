@@ -516,7 +516,7 @@ import { PortfolioChartComponent } from "../components/portfolio-chart.component
           <h1 class="text-2xl font-bold text-slate-900 mb-4">
             Portfolio Not Found
           </h1>
-          <a routerLink="/" class="text-blue-600 hover:text-blue-800"
+          <a routerLink="/dashboard" class="text-blue-600 hover:text-blue-800"
             >← Back to Portfolios</a
           >
         </div>
