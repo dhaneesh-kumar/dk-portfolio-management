@@ -136,6 +136,35 @@ import { SharePortfolioComponent } from "../components/share-portfolio.component
             </div>
           </div>
         } @else {
+          <!-- Demo Data Notice -->
+          <div class="bg-blue-50 border border-blue-200 rounded-xl p-6 mb-8">
+            <div class="flex items-center">
+              <svg
+                class="w-6 h-6 text-blue-600 mr-3"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+              <div>
+                <h3 class="text-blue-800 font-medium">Demo Mode Active</h3>
+                <p class="text-blue-700 text-sm mt-1">
+                  The app is currently using demo market data for Indian stocks.
+                  In production, this would connect to real-time market data APIs through a backend server.
+                </p>
+                <p class="text-blue-700 text-sm mt-1">
+                  All stock prices, changes, and market data shown are simulated for demonstration purposes.
+                </p>
+              </div>
+            </div>
+          </div>
+
           <!-- Firebase Setup Instructions -->
           <app-firebase-setup></app-firebase-setup>
 
