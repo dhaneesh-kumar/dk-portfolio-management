@@ -91,7 +91,13 @@ export class FirebasePortfolioService {
     try {
       this.loading.set(true);
       this.error.set(null);
-      
+
+      // Check if Firebase is configured
+      if (!db) {
+        this.error.set('Firebase not configured. Cannot save data.');
+        return null;
+      }
+
       const portfolioData = {
         name,
         description,
