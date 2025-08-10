@@ -73,11 +73,7 @@ import { APP_CONSTANTS } from "../../../core/constants/app.constants";
               </div>
 
               <!-- User Dropdown -->
-              <div
-                class="relative"
-                appClickOutside
-                (clickOutside)="closeUserMenu()"
-              >
+              <div class="relative">
                 <button
                   (click)="toggleUserMenu()"
                   class="flex items-center text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500"
