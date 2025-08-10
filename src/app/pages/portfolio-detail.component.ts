@@ -38,7 +38,7 @@ import { PortfolioChartComponent } from '../components/portfolio-chart.component
                   Rebalance
                 </button>
                 <button 
-                  (click)="showAddStockModal = true"
+                  (click)="showAddStockModal.set(true)"
                   class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors">
                   <svg class="w-5 h-5 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
@@ -212,7 +212,7 @@ import { PortfolioChartComponent } from '../components/portfolio-chart.component
                 <h3 class="text-lg font-medium text-slate-900 mb-2">No stocks added yet</h3>
                 <p class="text-slate-600 mb-4">Start building your portfolio by adding your first stock</p>
                 <button 
-                  (click)="showAddStockModal = true"
+                  (click)="showAddStockModal.set(true)"
                   class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors">
                   Add Your First Stock
                 </button>
@@ -222,7 +222,7 @@ import { PortfolioChartComponent } from '../components/portfolio-chart.component
         </div>
 
         <!-- Add Stock Modal -->
-        @if (showAddStockModal) {
+        @if (showAddStockModal()) {
           <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
             <div class="bg-white rounded-xl max-w-md w-full p-6">
               <h2 class="text-2xl font-bold text-slate-900 mb-4">Add Stock</h2>
@@ -294,7 +294,7 @@ import { PortfolioChartComponent } from '../components/portfolio-chart.component
                 <div class="flex gap-3">
                   <button 
                     type="button"
-                    (click)="showAddStockModal = false; resetNewStock()"
+                    (click)="showAddStockModal.set(false); resetNewStock()"
                     class="flex-1 px-4 py-2 text-slate-600 border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors">
                     Cancel
                   </button>
