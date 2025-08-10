@@ -8,7 +8,6 @@ import {
 
 @Directive({
   selector: "[appClickOutside]",
-  standalone: true,
 })
 export class ClickOutsideDirective {
   @Output() clickOutside = new EventEmitter<Event>();
