@@ -18,7 +18,7 @@ import { PortfolioChartComponent } from "../components/portfolio-chart.component
           <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
             <div class="flex items-center justify-between">
               <div class="flex items-center gap-4">
-                <a routerLink="/" class="text-slate-400 hover:text-slate-600">
+                <a routerLink="/dashboard" class="text-slate-400 hover:text-slate-600">
                   <svg
                     class="w-6 h-6"
                     fill="none"
