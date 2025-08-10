@@ -48,6 +48,28 @@ import { Portfolio } from "../models/portfolio.model";
 
       <!-- Main Content -->
       <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+        <!-- Loading State -->
+        @if (loading()) {
+          <div class="text-center py-12">
+            <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+            <p class="mt-4 text-slate-600">Loading portfolios...</p>
+          </div>
+        } @else if (error()) {
+          <!-- Error State -->
+          <div class="bg-red-50 border border-red-200 rounded-xl p-6 mb-8">
+            <div class="flex items-center">
+              <svg class="w-6 h-6 text-red-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+              <div>
+                <h3 class="text-red-800 font-medium">Error Loading Data</h3>
+                <p class="text-red-700 text-sm mt-1">{{error()}}</p>
+                <p class="text-red-700 text-sm">The app is running with sample data. Please configure Firebase to enable data persistence.</p>
+              </div>
+            </div>
+          </div>
+        } @else {
         <!-- Stats Overview -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <div
