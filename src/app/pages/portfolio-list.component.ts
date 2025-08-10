@@ -11,7 +11,7 @@ import { SharePortfolioComponent } from "../components/share-portfolio.component
 @Component({
   selector: "app-portfolio-list",
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, FirebaseSetupComponent],
+  imports: [CommonModule, RouterModule, FormsModule, FirebaseSetupComponent, HeaderComponent, SharePortfolioComponent],
   template: `
     <div class="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
       <!-- Header -->
