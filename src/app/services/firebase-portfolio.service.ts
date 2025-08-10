@@ -21,12 +21,20 @@ import { AuthService } from "./auth.service";
   providedIn: "root",
 })
 export class FirebasePortfolioService {
+  private authService = inject(AuthService);
   private portfolios = signal<Portfolio[]>([]);
   private loading = signal<boolean>(false);
   private error = signal<string | null>(null);
 
   constructor() {
-    this.loadPortfolios();
+    // Load portfolios when user authentication state changes
+    this.authService.getUser().subscribe(user => {
+      if (user) {
+        this.loadPortfolios();
+      } else {
+        this.portfolios.set([]);
+      }
+    });
   }
 
   getPortfolios() {
