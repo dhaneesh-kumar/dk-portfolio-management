@@ -32,14 +32,7 @@ import { CommonModule } from '@angular/common';
               
               <div class="mt-4 p-3 bg-blue-100 rounded-lg">
                 <p class="font-medium text-blue-800 mb-2">Sample Firebase Config:</p>
-                <pre class="text-xs text-blue-700 overflow-x-auto"><code>{
-  apiKey: "your-api-key-here",
-  authDomain: "your-project.firebaseapp.com",
-  projectId: "your-project-id",
-  storageBucket: "your-project.appspot.com",
-  messagingSenderId: "123456789",
-  appId: "your-app-id"
-}</code></pre>
+                <pre class="text-xs text-blue-700 overflow-x-auto"><code>{{'{'}}<br>  apiKey: "your-api-key-here",<br>  authDomain: "your-project.firebaseapp.com",<br>  projectId: "your-project-id",<br>  storageBucket: "your-project.appspot.com",<br>  messagingSenderId: "123456789",<br>  appId: "your-app-id"<br>{{'}'}} </code></pre>
               </div>
               
               <div class="mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
