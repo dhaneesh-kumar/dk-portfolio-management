@@ -112,6 +112,23 @@ import { PortfolioChartComponent } from '../components/portfolio-chart.component
             </div>
           </div>
 
+          <!-- Portfolio Charts -->
+          @if (portfolio()!.stocks.length > 0) {
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+              <app-portfolio-chart
+                [stocks]="portfolio()!.stocks"
+                title="Portfolio Allocation (Pie Chart)"
+                type="pie">
+              </app-portfolio-chart>
+
+              <app-portfolio-chart
+                [stocks]="portfolio()!.stocks"
+                title="Holdings Distribution (Bar Chart)"
+                type="bar">
+              </app-portfolio-chart>
+            </div>
+          }
+
           <!-- Stock Holdings Table -->
           <div class="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden">
             <div class="px-6 py-4 border-b border-slate-200">
