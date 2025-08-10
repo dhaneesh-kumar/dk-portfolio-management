@@ -30,6 +30,7 @@ const firebaseConfig = {
 
 let app: FirebaseApp | undefined;
 let db: Firestore | undefined;
+let auth: Auth | undefined;
 
 try {
   // Initialize Firebase only if valid config is provided
