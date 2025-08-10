@@ -432,6 +432,7 @@ export class FirebasePortfolioService {
       createdAt: new Date(),
       updatedAt: new Date(),
       isTemplate: true,
+      comments: [],
     };
 
     this.portfolios.set([nifty50]);
