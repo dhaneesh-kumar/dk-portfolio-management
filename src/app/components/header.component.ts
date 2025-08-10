@@ -52,8 +52,8 @@ import { AuthService } from '../services/auth.service';
                 }
                 
                 <div class="hidden sm:block">
-                  <p class="text-sm font-medium text-gray-900">{{authService.getUser()?.displayName}}</p>
-                  <p class="text-xs text-gray-500">{{authService.getUser()?.email}}</p>
+                  <p class="text-sm font-medium text-gray-900">{{authService.getUser()()?.displayName}}</p>
+                  <p class="text-xs text-gray-500">{{authService.getUser()()?.email}}</p>
                 </div>
               </div>
 
