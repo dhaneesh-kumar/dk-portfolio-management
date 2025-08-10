@@ -1,4 +1,4 @@
-import { Injectable, signal } from "@angular/core";
+import { Injectable, signal, OnDestroy } from "@angular/core";
 import {
   getAuth,
   signInWithPopup,
@@ -12,15 +12,19 @@ import {
   sendPasswordResetEmail,
 } from "firebase/auth";
 import { User } from "../models/portfolio.model";
+import { fromEventPattern, Subscription } from 'rxjs';
 
 @Injectable({
   providedIn: "root",
 })
-export class AuthService {
-  private auth: any;
+export class AuthService implements OnDestroy {
   user = signal<User | null>(null);
   loading = signal<boolean>(true);
   error = signal<string | null>(null);
+
+  private auth: any;
+  private authSubscription: Subscription | null = null;
+  private authResolved = false;
 
   constructor() {
     this.initFirebaseAuth();
@@ -40,7 +44,8 @@ export class AuthService {
   }
 
   isAuthenticated() {
-    return this.user() !== null;
+    // Only authenticated if auth state has been resolved and user is set
+    return this.authResolved && this.user() !== null;
   }
 
   private initAuthListener() {
@@ -51,63 +56,52 @@ export class AuthService {
       return;
     }
 
-    try {
-      // Add a timeout to prevent infinite loading
-      // const authTimeout = setTimeout(() => {
-      //   console.warn("⚠️ Auth initialization timed out, redirecting to login");
-      //   this.user.set(null);
-      //   this.loading.set(false);
-      //   // Force redirect to login after timeout
-      //   window.location.href = "/login";
-      // }, 3000); // Reduced to 3 seconds
+    // Create an observable from the onAuthStateChanged listener
+    const authState$ = fromEventPattern< FirebaseUser | null >(
+      (handler) => onAuthStateChanged(this.auth, handler, (error) => handler(null)),
+      (handler, unsubscribe) => unsubscribe()
+    );
 
-      onAuthStateChanged(
-        this.auth,
-        (firebaseUser: FirebaseUser | null) => {
-          // clearTimeout(authTimeout); // Clear timeout once auth state is determined
-          console.log(
-            "🔄 Auth state changed:",
-            firebaseUser ? firebaseUser.email : "No user",
-          );
-          if (firebaseUser) {
-            const user: User = {
-              uid: firebaseUser.uid,
-              email: firebaseUser.email || "",
-              displayName:
-                firebaseUser.displayName || firebaseUser.email || "User",
-              photoURL: firebaseUser.photoURL || undefined,
-            };
-            this.user.set(user);
-            console.log("✅ User authenticated:", user.email);
-          } else {
-            this.user.set(null);
-            console.log("📝 No user session found, redirecting to login");
-            // Immediately redirect to login if no user
-            // setTimeout(() => {
-            //   if (!this.isAuthenticated()) {
-            //     window.location.href = "/login";
-            //   }
-            // }, 100);
-            this.loading.set(false);
-          }
-          this.loading.set(false);
-        },
-        (error) => {
-          // clearTimeout(authTimeout);
-          console.error("❌ Auth state change error:", error);
+    let firstAuthState = true;
+    this.authSubscription = authState$.subscribe({
+      next: (firebaseUser: FirebaseUser | null) => {
+        if (firstAuthState) {
+          this.authResolved = true;
+          firstAuthState = false;
+        }
+        console.log(
+          "🔄 Auth state changed:",
+          firebaseUser ? firebaseUser.email : "No user",
+        );
+        if (firebaseUser) {
+          const user: User = {
+            uid: firebaseUser.uid,
+            email: firebaseUser.email || "",
+            displayName:
+              firebaseUser.displayName || firebaseUser.email || "User",
+            photoURL: firebaseUser.photoURL || undefined,
+          };
+          this.user.set(user);
+          console.log("✅ User authenticated:", user.email);
+        } else {
           this.user.set(null);
-          this.loading.set(false);
-          this.error.set("Authentication initialization failed");
-          // Redirect to login on error
-          // setTimeout(() => (window.location.href = "/login"), 1000);
-        },
-      );
-    } catch (error) {
-      console.error("❌ Failed to initialize auth listener:", error);
-      this.user.set(null);
-      this.loading.set(false);
-      this.error.set("Authentication service unavailable");
-      // Redirect to login on error
+          console.log("📝 No user session found, redirecting to login");
+        }
+        this.loading.set(false);
+      },
+      error: (error) => {
+        this.authResolved = true;
+        console.error("❌ Auth state change error:", error);
+        this.user.set(null);
+        this.loading.set(false);
+        this.error.set("Authentication initialization failed");
+      }
+    });
+  }
+
+  ngOnDestroy(): void {
+    if (this.authSubscription) {
+      this.authSubscription.unsubscribe();
     }
   }
 

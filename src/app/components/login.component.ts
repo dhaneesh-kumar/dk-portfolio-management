@@ -2,6 +2,7 @@ import { Component, inject, signal } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { FormsModule } from "@angular/forms";
 import { AuthService } from "../services/auth.service";
+import { Router } from "@angular/router";
 
 @Component({
   selector: "app-login",
@@ -371,6 +372,8 @@ import { AuthService } from "../services/auth.service";
 })
 export class LoginComponent {
   authService = inject(AuthService);
+  router = inject(Router);
+
 
   activeTab = signal<"signin" | "signup">("signin");
   showForgotPassword = signal(false);
@@ -403,6 +406,7 @@ export class LoginComponent {
 
       if (success) {
         this.signinData = { email: "", password: "" };
+        this.router.navigate(["/dashboard"]);
       }
     }
   }
