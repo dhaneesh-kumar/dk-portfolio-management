@@ -9,7 +9,7 @@ import { FirebaseSetupComponent } from "../components/firebase-setup.component";
 @Component({
   selector: "app-portfolio-list",
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule],
+  imports: [CommonModule, RouterModule, FormsModule, FirebaseSetupComponent],
   template: `
     <div class="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
       <!-- Header -->
