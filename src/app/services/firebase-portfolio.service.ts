@@ -73,7 +73,6 @@ export class FirebasePortfolioService {
       const ownedQuery = query(
         collection(db, "portfolios"),
         where("ownerId", "==", user.uid),
-        orderBy("createdAt", "desc"),
       );
       const ownedSnapshot = await getDocs(ownedQuery);
 
