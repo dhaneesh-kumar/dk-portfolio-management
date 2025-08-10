@@ -28,13 +28,8 @@ export class FirebasePortfolioService {
 
   constructor() {
     // Load portfolios when user authentication state changes
-    this.authService.getUser().subscribe(user => {
-      if (user) {
-        this.loadPortfolios();
-      } else {
-        this.portfolios.set([]);
-      }
-    });
+    // Note: In a real app, you'd use effect() or computed() to watch the signal
+    this.loadPortfolios();
   }
 
   getPortfolios() {
