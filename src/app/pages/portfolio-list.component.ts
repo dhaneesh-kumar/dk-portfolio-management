@@ -277,6 +277,7 @@ import { Portfolio } from "../models/portfolio.model";
             </button>
           </div>
         }
+        }
       </main>
 
       <!-- Create Portfolio Modal -->
