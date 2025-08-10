@@ -576,19 +576,21 @@ export class PortfolioDetailComponent {
     }
   }
 
-  addStock(): void {
+  async addStock(): Promise<void> {
     if (
       this.newStock.ticker &&
       this.newStock.name &&
       this.newStock.shares > 0 &&
       this.newStock.currentPrice > 0
     ) {
-      this.portfolioService.addStockToPortfolio(
+      const result = await this.portfolioService.addStockToPortfolio(
         this.portfolioId(),
         this.newStock,
       );
-      this.resetNewStock();
-      this.showAddStockModal.set(false);
+      if (result) {
+        this.resetNewStock();
+        this.showAddStockModal.set(false);
+      }
     }
   }
 
@@ -602,13 +604,13 @@ export class PortfolioDetailComponent {
     };
   }
 
-  rebalancePortfolio(): void {
+  async rebalancePortfolio(): Promise<void> {
     if (
       confirm(
         "This will adjust your share quantities to match the assigned weights. Continue?",
       )
     ) {
-      this.portfolioService.rebalancePortfolio(this.portfolioId());
+      await this.portfolioService.rebalancePortfolio(this.portfolioId());
     }
   }
 }
