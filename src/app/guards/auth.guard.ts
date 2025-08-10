@@ -1,29 +1,43 @@
 import { inject } from "@angular/core";
-import { CanActivateFn, Router } from "@angular/router";
+import { CanActivateFn, Router, UrlTree } from "@angular/router";
 import { AuthService } from "../services/auth.service";
+import { map, take } from 'rxjs/operators';
+import { Observable } from "rxjs";
 
-export const authGuard: CanActivateFn = (route, state) => {
+export const authGuard: CanActivateFn = (
+  route,
+  state,
+): Observable<boolean | UrlTree> => {
   const authService = inject(AuthService);
   const router = inject(Router);
 
-  if (authService.isAuthenticated()) {
-    return true;
-  }
-
-  // Redirect to login if not authenticated
-  router.navigate(["/login"]);
-  return false;
+  return authService.authStatus$().pipe(
+    take(1),
+    map((isAuthenticated) => {
+      if (isAuthenticated) {
+        return true;
+      } else {
+        return router.createUrlTree(["/login"]);
+      }
+    }),
+  );
 };
 
-export const guestGuard: CanActivateFn = (route, state) => {
+export const guestGuard: CanActivateFn = (
+  route,
+  state,
+): Observable<boolean | UrlTree> => {
   const authService = inject(AuthService);
   const router = inject(Router);
 
-  if (!authService.isAuthenticated()) {
-    return true;
-  }
-
-  // Redirect to dashboard if already authenticated
-  router.navigate(["/dashboard"]);
-  return false;
+  return authService.authStatus$().pipe(
+    take(1),
+    map((isAuthenticated) => {
+      if (!isAuthenticated) {
+        return true;
+      } else {
+        return router.createUrlTree(["/dashboard"]);
+      }
+    }),
+  );
 };

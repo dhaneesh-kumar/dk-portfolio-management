@@ -12,7 +12,7 @@ import {
   sendPasswordResetEmail,
 } from "firebase/auth";
 import { User } from "../models/portfolio.model";
-import { fromEventPattern, Subscription } from 'rxjs';
+import { fromEventPattern, Subscription, ReplaySubject, map } from 'rxjs';
 
 @Injectable({
   providedIn: "root",
@@ -24,7 +24,7 @@ export class AuthService implements OnDestroy {
 
   private auth: any;
   private authSubscription: Subscription | null = null;
-  private authResolved = false;
+  private _authReady = new ReplaySubject<boolean>(1); // Emit true when auth state is first resolved
 
   constructor() {
     this.initFirebaseAuth();
@@ -40,12 +40,13 @@ export class AuthService implements OnDestroy {
       this.user.set(null);
       this.loading.set(false);
       this.error.set("Firebase authentication not available");
+      this._authReady.next(true); // Signal that auth is ready even if it failed
     }
   }
 
-  isAuthenticated() {
-    // Only authenticated if auth state has been resolved and user is set
-    return this.authResolved && this.user() !== null;
+  authStatus$() {
+    // Returns an observable that emits the authentication status only after the initial auth state is resolved
+    return this._authReady.pipe(map(() => this.user() !== null));
   }
 
   private initAuthListener() {
@@ -53,6 +54,7 @@ export class AuthService implements OnDestroy {
       console.error("❌ Firebase Auth not initialized");
       this.user.set(null);
       this.loading.set(false);
+      this._authReady.next(true); // Signal that auth is ready even if it failed
       return;
     }
 
@@ -66,7 +68,6 @@ export class AuthService implements OnDestroy {
     this.authSubscription = authState$.subscribe({
       next: (firebaseUser: FirebaseUser | null) => {
         if (firstAuthState) {
-          this.authResolved = true;
           firstAuthState = false;
         }
         console.log(
@@ -88,13 +89,14 @@ export class AuthService implements OnDestroy {
           console.log("📝 No user session found, redirecting to login");
         }
         this.loading.set(false);
+        this._authReady.next(true); // Signal that the initial auth state has been processed
       },
       error: (error) => {
-        this.authResolved = true;
         console.error("❌ Auth state change error:", error);
         this.user.set(null);
         this.loading.set(false);
         this.error.set("Authentication initialization failed");
+        this._authReady.next(true); // Signal that auth is ready even if it failed
       }
     });
   }
@@ -103,6 +105,7 @@ export class AuthService implements OnDestroy {
     if (this.authSubscription) {
       this.authSubscription.unsubscribe();
     }
+    this._authReady.complete(); // Complete the ReplaySubject on destroy
   }
 
   async signInWithGoogle(): Promise<boolean> {
