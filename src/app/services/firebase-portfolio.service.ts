@@ -367,6 +367,60 @@ export class FirebasePortfolioService {
     return await this.updatePortfolio(portfolio);
   }
 
+  async updateStockMarketData(
+    portfolioId: string,
+    stockTicker: string,
+    marketData: MarketData,
+  ): Promise<boolean> {
+    const portfolio = this.getPortfolio(portfolioId);
+    if (!portfolio) return false;
+
+    const stock = portfolio.stocks.find((s) => s.ticker.toUpperCase() === stockTicker.toUpperCase());
+    if (!stock) return false;
+
+    // Update market data
+    stock.marketData = marketData;
+
+    // Update current price and total value if market data has price
+    if (marketData.price > 0) {
+      stock.currentPrice = marketData.price;
+      stock.totalValue = stock.shares * stock.currentPrice;
+    }
+
+    // Recalculate portfolio totals
+    this.calculatePortfolioTotals(portfolio);
+
+    return await this.updatePortfolio(portfolio);
+  }
+
+  async updateAllStocksMarketData(
+    portfolioId: string,
+    marketDataMap: { [ticker: string]: MarketData },
+  ): Promise<boolean> {
+    const portfolio = this.getPortfolio(portfolioId);
+    if (!portfolio) return false;
+
+    let updated = false;
+    for (const stock of portfolio.stocks) {
+      const marketData = marketDataMap[stock.ticker.toUpperCase()];
+      if (marketData) {
+        stock.marketData = marketData;
+        if (marketData.price > 0) {
+          stock.currentPrice = marketData.price;
+          stock.totalValue = stock.shares * stock.currentPrice;
+        }
+        updated = true;
+      }
+    }
+
+    if (updated) {
+      this.calculatePortfolioTotals(portfolio);
+      return await this.updatePortfolio(portfolio);
+    }
+
+    return false;
+  }
+
   private calculatePortfolioTotals(portfolio: Portfolio): void {
     portfolio.totalValue = portfolio.stocks.reduce(
       (sum, stock) => sum + stock.totalValue,
