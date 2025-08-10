@@ -125,6 +125,14 @@ export class AuthService implements OnDestroy {
    * Sign in with email and password
    */
   async signInWithEmail(email: string, password: string): Promise<boolean> {
+    if (!this.firebaseAuth) {
+      this.notificationService.error(
+        "Authentication unavailable",
+        "Firebase authentication is not configured",
+      );
+      return false;
+    }
+
     return this.executeAuthAction(async () => {
       const result = await signInWithEmailAndPassword(
         this.firebaseAuth!,
