@@ -5,12 +5,13 @@ import { getFirestore, Firestore } from 'firebase/firestore';
 // 🔧 TO ENABLE FIREBASE: Replace these placeholder values with your actual Firebase project config
 // You can get these values from your Firebase project settings in the Firebase Console
 const firebaseConfig = {
-  apiKey: "your-api-key-here",                    // Your Firebase API key
-  authDomain: "your-project-id.firebaseapp.com", // Your Firebase Auth domain
-  projectId: "your-project-id",                  // Your Firebase project ID (required for Firestore)
-  storageBucket: "your-project-id.appspot.com",  // Your Firebase Storage bucket
-  messagingSenderId: "123456789",                // Your Firebase messaging sender ID
-  appId: "your-app-id"                          // Your Firebase app ID
+  apiKey: "AIzaSyBZ-5dV69zwzqGn4CiGE75x9vMlKtzz-YQ",
+  authDomain: "dk-portfolio-management.firebaseapp.com",
+  projectId: "dk-portfolio-management",
+  storageBucket: "dk-portfolio-management.firebasestorage.app",
+  messagingSenderId: "57739749423",
+  appId: "1:57739749423:web:4996fcbfd4b83248c9beda",
+  measurementId: "G-762MYXMRV9"
 };
 
 // 🚀 SETUP INSTRUCTIONS:
