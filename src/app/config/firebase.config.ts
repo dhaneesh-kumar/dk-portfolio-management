@@ -1,5 +1,5 @@
-import { initializeApp, FirebaseApp } from 'firebase/app';
-import { getFirestore, Firestore } from 'firebase/firestore';
+import { initializeApp, FirebaseApp } from "firebase/app";
+import { getFirestore, Firestore } from "firebase/firestore";
 
 // Firebase configuration
 // 🔧 TO ENABLE FIREBASE: Replace these placeholder values with your actual Firebase project config
@@ -11,7 +11,7 @@ const firebaseConfig = {
   storageBucket: "dk-portfolio-management.firebasestorage.app",
   messagingSenderId: "57739749423",
   appId: "1:57739749423:web:4996fcbfd4b83248c9beda",
-  measurementId: "G-762MYXMRV9"
+  measurementId: "G-762MYXMRV9",
 };
 
 // 🚀 SETUP INSTRUCTIONS:
@@ -32,17 +32,24 @@ let db: Firestore | undefined;
 
 try {
   // Initialize Firebase only if valid config is provided
-  if (firebaseConfig.projectId && firebaseConfig.projectId !== "your-project-id") {
+  if (
+    firebaseConfig.projectId &&
+    firebaseConfig.projectId !== "your-project-id"
+  ) {
     app = initializeApp(firebaseConfig);
     db = getFirestore(app);
-    console.log('✅ Firebase initialized successfully');
+    console.log("✅ Firebase initialized successfully");
   } else {
-    console.warn('⚠️ Firebase not configured. Using sample data mode.');
-    console.log('📖 See Firebase setup instructions in the app or check src/app/config/firebase.config.ts');
+    console.warn("⚠️ Firebase not configured. Using sample data mode.");
+    console.log(
+      "📖 See Firebase setup instructions in the app or check src/app/config/firebase.config.ts",
+    );
   }
 } catch (error) {
-  console.error('❌ Firebase initialization failed:', error);
-  console.log('📖 Please check your Firebase configuration in src/app/config/firebase.config.ts');
+  console.error("❌ Firebase initialization failed:", error);
+  console.log(
+    "📖 Please check your Firebase configuration in src/app/config/firebase.config.ts",
+  );
 }
 
 export { db };

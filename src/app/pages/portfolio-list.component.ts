@@ -49,239 +49,254 @@ import { FirebaseSetupComponent } from "../components/firebase-setup.component";
 
       <!-- Main Content -->
       <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-
         <!-- Loading State -->
         @if (loading()) {
           <div class="text-center py-12">
-            <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+            <div
+              class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"
+            ></div>
             <p class="mt-4 text-slate-600">Loading portfolios...</p>
           </div>
         } @else if (error()) {
           <!-- Error State -->
           <div class="bg-red-50 border border-red-200 rounded-xl p-6 mb-8">
             <div class="flex items-center">
-              <svg class="w-6 h-6 text-red-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              <svg
+                class="w-6 h-6 text-red-600 mr-3"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
               </svg>
               <div>
                 <h3 class="text-red-800 font-medium">Error Loading Data</h3>
-                <p class="text-red-700 text-sm mt-1">{{error()}}</p>
-                <p class="text-red-700 text-sm">The app is running with sample data. Please configure Firebase to enable data persistence.</p>
+                <p class="text-red-700 text-sm mt-1">{{ error() }}</p>
+                <p class="text-red-700 text-sm">
+                  The app is running with sample data. Please configure Firebase
+                  to enable data persistence.
+                </p>
               </div>
             </div>
           </div>
         } @else {
+          <!-- Firebase Setup Instructions -->
+          <app-firebase-setup></app-firebase-setup>
 
-        <!-- Firebase Setup Instructions -->
-        <app-firebase-setup></app-firebase-setup>
-
-        <!-- Stats Overview -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div
-            class="bg-white rounded-xl p-6 shadow-lg border border-slate-200"
-          >
-            <div class="flex items-center">
-              <div class="p-3 bg-green-100 rounded-lg">
-                <svg
-                  class="w-6 h-6 text-green-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"
-                  />
-                </svg>
-              </div>
-              <div class="ml-4">
-                <p class="text-sm font-medium text-slate-600">Total Value</p>
-                <p class="text-2xl font-bold text-slate-900">
-                  ₹{{ getTotalValue() | number: "1.0-0" }}
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div
-            class="bg-white rounded-xl p-6 shadow-lg border border-slate-200"
-          >
-            <div class="flex items-center">
-              <div class="p-3 bg-blue-100 rounded-lg">
-                <svg
-                  class="w-6 h-6 text-blue-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
-                  />
-                </svg>
-              </div>
-              <div class="ml-4">
-                <p class="text-sm font-medium text-slate-600">Portfolios</p>
-                <p class="text-2xl font-bold text-slate-900">
-                  {{ portfolios().length }}
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div
-            class="bg-white rounded-xl p-6 shadow-lg border border-slate-200"
-          >
-            <div class="flex items-center">
-              <div class="p-3 bg-purple-100 rounded-lg">
-                <svg
-                  class="w-6 h-6 text-purple-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 00-2-2z"
-                  />
-                </svg>
-              </div>
-              <div class="ml-4">
-                <p class="text-sm font-medium text-slate-600">Avg Return</p>
-                <p class="text-2xl font-bold text-green-600">
-                  +{{ getAverageReturn() }}%
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Portfolio Grid -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-          @for (portfolio of portfolios(); track portfolio.id) {
+          <!-- Stats Overview -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
             <div
-              class="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden hover:shadow-xl transition-shadow duration-300"
+              class="bg-white rounded-xl p-6 shadow-lg border border-slate-200"
             >
-              <div class="p-6">
-                <div class="flex items-start justify-between">
-                  <div class="flex-1">
-                    <div class="flex items-center gap-2 mb-2">
-                      <h3 class="text-xl font-bold text-slate-900">
-                        {{ portfolio.name }}
-                      </h3>
-                      @if (portfolio.isTemplate) {
-                        <span
-                          class="px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full"
-                          >Template</span
-                        >
-                      }
-                    </div>
-                    <p class="text-slate-600 text-sm mb-4">
-                      {{ portfolio.description }}
-                    </p>
+              <div class="flex items-center">
+                <div class="p-3 bg-green-100 rounded-lg">
+                  <svg
+                    class="w-6 h-6 text-green-600"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"
+                    />
+                  </svg>
+                </div>
+                <div class="ml-4">
+                  <p class="text-sm font-medium text-slate-600">Total Value</p>
+                  <p class="text-2xl font-bold text-slate-900">
+                    ₹{{ getTotalValue() | number: "1.0-0" }}
+                  </p>
+                </div>
+              </div>
+            </div>
 
-                    <div class="space-y-3">
-                      <div class="flex justify-between items-center">
-                        <span class="text-sm text-slate-600">Total Value</span>
-                        <span class="font-semibold text-slate-900"
-                          >₹{{ portfolio.totalValue | number: "1.0-0" }}</span
-                        >
+            <div
+              class="bg-white rounded-xl p-6 shadow-lg border border-slate-200"
+            >
+              <div class="flex items-center">
+                <div class="p-3 bg-blue-100 rounded-lg">
+                  <svg
+                    class="w-6 h-6 text-blue-600"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
+                    />
+                  </svg>
+                </div>
+                <div class="ml-4">
+                  <p class="text-sm font-medium text-slate-600">Portfolios</p>
+                  <p class="text-2xl font-bold text-slate-900">
+                    {{ portfolios().length }}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div
+              class="bg-white rounded-xl p-6 shadow-lg border border-slate-200"
+            >
+              <div class="flex items-center">
+                <div class="p-3 bg-purple-100 rounded-lg">
+                  <svg
+                    class="w-6 h-6 text-purple-600"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 00-2-2z"
+                    />
+                  </svg>
+                </div>
+                <div class="ml-4">
+                  <p class="text-sm font-medium text-slate-600">Avg Return</p>
+                  <p class="text-2xl font-bold text-green-600">
+                    +{{ getAverageReturn() }}%
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Portfolio Grid -->
+          <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+            @for (portfolio of portfolios(); track portfolio.id) {
+              <div
+                class="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden hover:shadow-xl transition-shadow duration-300"
+              >
+                <div class="p-6">
+                  <div class="flex items-start justify-between">
+                    <div class="flex-1">
+                      <div class="flex items-center gap-2 mb-2">
+                        <h3 class="text-xl font-bold text-slate-900">
+                          {{ portfolio.name }}
+                        </h3>
+                        @if (portfolio.isTemplate) {
+                          <span
+                            class="px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full"
+                            >Template</span
+                          >
+                        }
                       </div>
+                      <p class="text-slate-600 text-sm mb-4">
+                        {{ portfolio.description }}
+                      </p>
 
-                      <div class="flex justify-between items-center">
-                        <span class="text-sm text-slate-600">Return</span>
-                        <span
-                          class="font-semibold"
-                          [class]="
-                            portfolio.totalReturnPercent >= 0
-                              ? 'text-green-600'
-                              : 'text-red-600'
-                          "
-                        >
-                          {{ portfolio.totalReturnPercent >= 0 ? "+" : ""
-                          }}{{ portfolio.totalReturnPercent }}%
-                        </span>
-                      </div>
+                      <div class="space-y-3">
+                        <div class="flex justify-between items-center">
+                          <span class="text-sm text-slate-600"
+                            >Total Value</span
+                          >
+                          <span class="font-semibold text-slate-900"
+                            >₹{{ portfolio.totalValue | number: "1.0-0" }}</span
+                          >
+                        </div>
 
-                      <div class="flex justify-between items-center">
-                        <span class="text-sm text-slate-600">Stocks</span>
-                        <span class="font-semibold text-slate-900">{{
-                          portfolio.stocks.length
-                        }}</span>
+                        <div class="flex justify-between items-center">
+                          <span class="text-sm text-slate-600">Return</span>
+                          <span
+                            class="font-semibold"
+                            [class]="
+                              portfolio.totalReturnPercent >= 0
+                                ? 'text-green-600'
+                                : 'text-red-600'
+                            "
+                          >
+                            {{ portfolio.totalReturnPercent >= 0 ? "+" : ""
+                            }}{{ portfolio.totalReturnPercent }}%
+                          </span>
+                        </div>
+
+                        <div class="flex justify-between items-center">
+                          <span class="text-sm text-slate-600">Stocks</span>
+                          <span class="font-semibold text-slate-900">{{
+                            portfolio.stocks.length
+                          }}</span>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
 
-                <div class="mt-6 flex gap-3">
-                  <a
-                    [routerLink]="['/portfolio', portfolio.id]"
-                    class="flex-1 bg-blue-600 hover:bg-blue-700 text-white text-center py-2 px-4 rounded-lg font-medium transition-colors"
-                  >
-                    View Portfolio
-                  </a>
-                  @if (!portfolio.isTemplate) {
-                    <button
-                      (click)="deletePortfolio(portfolio.id)"
-                      class="px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                  <div class="mt-6 flex gap-3">
+                    <a
+                      [routerLink]="['/portfolio', portfolio.id]"
+                      class="flex-1 bg-blue-600 hover:bg-blue-700 text-white text-center py-2 px-4 rounded-lg font-medium transition-colors"
                     >
-                      <svg
-                        class="w-5 h-5"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
+                      View Portfolio
+                    </a>
+                    @if (!portfolio.isTemplate) {
+                      <button
+                        (click)="deletePortfolio(portfolio.id)"
+                        class="px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                       >
-                        <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          stroke-width="2"
-                          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                        />
-                      </svg>
-                    </button>
-                  }
+                        <svg
+                          class="w-5 h-5"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                          />
+                        </svg>
+                      </button>
+                    }
+                  </div>
                 </div>
               </div>
+            }
+          </div>
+
+          <!-- Empty State -->
+          @if (portfolios().length === 0) {
+            <div class="text-center py-12">
+              <svg
+                class="w-24 h-24 text-slate-300 mx-auto mb-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="1"
+                  d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
+                />
+              </svg>
+              <h3 class="text-xl font-medium text-slate-900 mb-2">
+                No portfolios yet
+              </h3>
+              <p class="text-slate-600 mb-6">
+                Create your first portfolio to start tracking your investments
+              </p>
+              <button
+                (click)="showCreateModal.set(true)"
+                class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors"
+              >
+                Create Your First Portfolio
+              </button>
             </div>
           }
-        </div>
-
-        <!-- Empty State -->
-        @if (portfolios().length === 0) {
-          <div class="text-center py-12">
-            <svg
-              class="w-24 h-24 text-slate-300 mx-auto mb-4"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="1"
-                d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
-              />
-            </svg>
-            <h3 class="text-xl font-medium text-slate-900 mb-2">
-              No portfolios yet
-            </h3>
-            <p class="text-slate-600 mb-6">
-              Create your first portfolio to start tracking your investments
-            </p>
-            <button
-              (click)="showCreateModal.set(true)"
-              class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors"
-            >
-              Create Your First Portfolio
-            </button>
-          </div>
-        }
         }
       </main>
 
