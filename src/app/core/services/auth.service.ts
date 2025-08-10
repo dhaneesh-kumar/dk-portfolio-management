@@ -217,8 +217,15 @@ export class AuthService implements OnDestroy {
    */
   private initializeFirebaseAuth(): void {
     try {
-      this.auth = getAuth();
-      this.setupAuthListener();
+      this.firebaseAuth = auth;
+      if (this.firebaseAuth) {
+        this.setupAuthListener();
+      } else {
+        this.logger.warn("Firebase auth not configured, using fallback mode");
+        this.handleAuthInitializationFailure(
+          "Firebase authentication not configured",
+        );
+      }
     } catch (error) {
       this.logger.error("Failed to initialize Firebase Auth", error as Error);
       this.handleAuthInitializationFailure(
