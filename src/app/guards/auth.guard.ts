@@ -23,7 +23,7 @@ export const guestGuard: CanActivateFn = (route, state) => {
     return true;
   }
 
-  // Redirect to portfolios if already authenticated
-  router.navigate(["/"]);
+  // Redirect to dashboard if already authenticated
+  router.navigate(["/dashboard"]);
   return false;
 };
