@@ -487,13 +487,13 @@ export class StockDetailComponent {
     this.noteForm.content = "";
   }
 
-  deleteNote(noteId: string): void {
+  async deleteNote(noteId: string): Promise<void> {
     if (confirm("Are you sure you want to delete this note?")) {
       const p = this.portfolio();
       const s = this.stock();
       if (p && s) {
         s.notes = s.notes.filter((n) => n.id !== noteId);
-        this.portfolioService.updatePortfolio(p);
+        await this.portfolioService.updatePortfolio(p);
       }
     }
   }
