@@ -238,7 +238,7 @@ export class AuthService implements OnDestroy {
    * Setup authentication state listener
    */
   private setupAuthListener(): void {
-    if (!this.auth) {
+    if (!this.firebaseAuth) {
       this.logger.error("Firebase Auth not initialized");
       this.handleAuthInitializationFailure(
         "Authentication service unavailable",
@@ -248,7 +248,7 @@ export class AuthService implements OnDestroy {
 
     const authState$ = fromEventPattern<FirebaseUser | null>(
       (handler) =>
-        onAuthStateChanged(this.auth, handler, (error) => handler(null)),
+        onAuthStateChanged(this.firebaseAuth!, handler, (error) => handler(null)),
       (handler, unsubscribe) => unsubscribe(),
     );
 
