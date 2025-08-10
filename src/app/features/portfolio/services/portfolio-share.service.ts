@@ -1,12 +1,12 @@
-import { Injectable, inject } from '@angular/core';
-import { Observable, of } from 'rxjs';
+import { Injectable, inject } from "@angular/core";
+import { Observable, of } from "rxjs";
 
-import { 
-  PortfolioShare, 
-  SharePortfolioDto, 
-  SharePermissions 
-} from '../models/portfolio.model';
-import { LoggerService } from '../../../core/services/logger.service';
+import {
+  PortfolioShare,
+  SharePortfolioDto,
+  SharePermissions,
+} from "../models/portfolio.model";
+import { LoggerService } from "../../../core/services/logger.service";
 
 @Injectable()
 export class PortfolioShareService {
@@ -18,14 +18,14 @@ export class PortfolioShareService {
   async sharePortfolio(data: SharePortfolioDto): Promise<boolean> {
     try {
       // Simulate API call
-      this.logger.info('Portfolio shared', {
+      this.logger.info("Portfolio shared", {
         portfolioId: data.portfolioId,
-        sharedWith: data.email
+        sharedWith: data.email,
       });
-      
+
       return true;
     } catch (error) {
-      this.logger.error('Failed to share portfolio', error as Error);
+      this.logger.error("Failed to share portfolio", error as Error);
       throw error;
     }
   }
@@ -38,11 +38,11 @@ export class PortfolioShareService {
       // Simulate API call with sample data
       const shares: PortfolioShare[] = [
         {
-          id: 'share-1',
+          id: "share-1",
           portfolioId,
-          sharedWithEmail: 'john@example.com',
-          sharedById: 'user-1',
-          sharedByEmail: 'owner@example.com',
+          sharedWithEmail: "john@example.com",
+          sharedById: "user-1",
+          sharedByEmail: "owner@example.com",
           permissions: {
             canView: true,
             canEdit: false,
@@ -51,18 +51,18 @@ export class PortfolioShareService {
             canAddNotes: true,
             canComment: true,
             canShare: false,
-            canDelete: false
+            canDelete: false,
           },
-          message: 'Check out my portfolio!',
+          message: "Check out my portfolio!",
           isActive: true,
           createdAt: new Date(),
-          updatedAt: new Date()
-        }
+          updatedAt: new Date(),
+        },
       ];
 
       return of(shares);
     } catch (error) {
-      this.logger.error('Failed to get portfolio shares', error as Error);
+      this.logger.error("Failed to get portfolio shares", error as Error);
       return of([]);
     }
   }
@@ -71,19 +71,19 @@ export class PortfolioShareService {
    * Update share permissions
    */
   async updateSharePermissions(
-    shareId: string, 
-    permissions: SharePermissions
+    shareId: string,
+    permissions: SharePermissions,
   ): Promise<boolean> {
     try {
       // Simulate API call
-      this.logger.info('Share permissions updated', {
+      this.logger.info("Share permissions updated", {
         shareId,
-        permissions
+        permissions,
       });
-      
+
       return true;
     } catch (error) {
-      this.logger.error('Failed to update share permissions', error as Error);
+      this.logger.error("Failed to update share permissions", error as Error);
       throw error;
     }
   }
@@ -94,11 +94,11 @@ export class PortfolioShareService {
   async revokeShare(shareId: string): Promise<boolean> {
     try {
       // Simulate API call
-      this.logger.info('Portfolio share revoked', { shareId });
-      
+      this.logger.info("Portfolio share revoked", { shareId });
+
       return true;
     } catch (error) {
-      this.logger.error('Failed to revoke share', error as Error);
+      this.logger.error("Failed to revoke share", error as Error);
       throw error;
     }
   }
@@ -110,10 +110,10 @@ export class PortfolioShareService {
     try {
       // Simulate API call with sample data
       const sharedPortfolios: PortfolioShare[] = [];
-      
+
       return of(sharedPortfolios);
     } catch (error) {
-      this.logger.error('Failed to get shared portfolios', error as Error);
+      this.logger.error("Failed to get shared portfolios", error as Error);
       return of([]);
     }
   }
@@ -124,11 +124,11 @@ export class PortfolioShareService {
   async acceptShareInvitation(shareId: string): Promise<boolean> {
     try {
       // Simulate API call
-      this.logger.info('Portfolio share invitation accepted', { shareId });
-      
+      this.logger.info("Portfolio share invitation accepted", { shareId });
+
       return true;
     } catch (error) {
-      this.logger.error('Failed to accept share invitation', error as Error);
+      this.logger.error("Failed to accept share invitation", error as Error);
       throw error;
     }
   }
@@ -139,11 +139,11 @@ export class PortfolioShareService {
   async declineShareInvitation(shareId: string): Promise<boolean> {
     try {
       // Simulate API call
-      this.logger.info('Portfolio share invitation declined', { shareId });
-      
+      this.logger.info("Portfolio share invitation declined", { shareId });
+
       return true;
     } catch (error) {
-      this.logger.error('Failed to decline share invitation', error as Error);
+      this.logger.error("Failed to decline share invitation", error as Error);
       throw error;
     }
   }

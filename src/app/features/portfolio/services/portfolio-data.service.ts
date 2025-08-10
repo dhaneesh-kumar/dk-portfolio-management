@@ -1,17 +1,17 @@
-import { Injectable, inject } from '@angular/core';
-import { Observable, of } from 'rxjs';
+import { Injectable, inject } from "@angular/core";
+import { Observable, of } from "rxjs";
 
-import { 
-  Portfolio, 
-  CreatePortfolioDto, 
+import {
+  Portfolio,
+  CreatePortfolioDto,
   UpdatePortfolioDto,
   AddStockDto,
   UpdateStockDto,
   PortfolioPerformance,
-  RebalanceRecommendation
-} from '../models/portfolio.model';
-import { LoggerService } from '../../../core/services/logger.service';
-import { AuthService } from '../../../core/services/auth.service';
+  RebalanceRecommendation,
+} from "../models/portfolio.model";
+import { LoggerService } from "../../../core/services/logger.service";
+import { AuthService } from "../../../core/services/auth.service";
 
 @Injectable()
 export class PortfolioDataService {
@@ -25,14 +25,14 @@ export class PortfolioDataService {
     try {
       const user = this.authService.user();
       if (!user) {
-        throw new Error('User not authenticated');
+        throw new Error("User not authenticated");
       }
 
       // For now, return sample data
       // In a real app, this would call Firebase/API
       return this.getSamplePortfolios();
     } catch (error) {
-      this.logger.error('Failed to fetch portfolios', error as Error);
+      this.logger.error("Failed to fetch portfolios", error as Error);
       throw error;
     }
   }
@@ -43,9 +43,11 @@ export class PortfolioDataService {
   async getPortfolioById(id: string): Promise<Portfolio | null> {
     try {
       const portfolios = await this.getAllPortfolios();
-      return portfolios.find(p => p.id === id) || null;
+      return portfolios.find((p) => p.id === id) || null;
     } catch (error) {
-      this.logger.error('Failed to fetch portfolio', error as Error, { portfolioId: id });
+      this.logger.error("Failed to fetch portfolio", error as Error, {
+        portfolioId: id,
+      });
       throw error;
     }
   }
@@ -53,7 +55,9 @@ export class PortfolioDataService {
   /**
    * Create new portfolio
    */
-  async createPortfolio(data: CreatePortfolioDto & { ownerId: string; ownerEmail: string }): Promise<Portfolio> {
+  async createPortfolio(
+    data: CreatePortfolioDto & { ownerId: string; ownerEmail: string },
+  ): Promise<Portfolio> {
     try {
       // Simulate API call
       const newPortfolio: Portfolio = {
@@ -68,13 +72,16 @@ export class PortfolioDataService {
         ownerId: data.ownerId,
         ownerEmail: data.ownerEmail,
         createdAt: new Date(),
-        updatedAt: new Date()
+        updatedAt: new Date(),
       };
 
-      this.logger.info('Portfolio created', { portfolioId: newPortfolio.id, name: data.name });
+      this.logger.info("Portfolio created", {
+        portfolioId: newPortfolio.id,
+        name: data.name,
+      });
       return newPortfolio;
     } catch (error) {
-      this.logger.error('Failed to create portfolio', error as Error);
+      this.logger.error("Failed to create portfolio", error as Error);
       throw error;
     }
   }
@@ -85,10 +92,10 @@ export class PortfolioDataService {
   async updatePortfolio(data: UpdatePortfolioDto): Promise<boolean> {
     try {
       // Simulate API call
-      this.logger.info('Portfolio updated', { portfolioId: data.id });
+      this.logger.info("Portfolio updated", { portfolioId: data.id });
       return true;
     } catch (error) {
-      this.logger.error('Failed to update portfolio', error as Error);
+      this.logger.error("Failed to update portfolio", error as Error);
       throw error;
     }
   }
@@ -99,10 +106,10 @@ export class PortfolioDataService {
   async deletePortfolio(id: string): Promise<boolean> {
     try {
       // Simulate API call
-      this.logger.info('Portfolio deleted', { portfolioId: id });
+      this.logger.info("Portfolio deleted", { portfolioId: id });
       return true;
     } catch (error) {
-      this.logger.error('Failed to delete portfolio', error as Error);
+      this.logger.error("Failed to delete portfolio", error as Error);
       throw error;
     }
   }
@@ -113,13 +120,13 @@ export class PortfolioDataService {
   async addStockToPortfolio(data: AddStockDto): Promise<boolean> {
     try {
       // Simulate API call
-      this.logger.info('Stock added to portfolio', { 
-        portfolioId: data.portfolioId, 
-        ticker: data.ticker 
+      this.logger.info("Stock added to portfolio", {
+        portfolioId: data.portfolioId,
+        ticker: data.ticker,
       });
       return true;
     } catch (error) {
-      this.logger.error('Failed to add stock', error as Error);
+      this.logger.error("Failed to add stock", error as Error);
       throw error;
     }
   }
@@ -130,13 +137,13 @@ export class PortfolioDataService {
   async updateStock(data: UpdateStockDto): Promise<boolean> {
     try {
       // Simulate API call
-      this.logger.info('Stock updated', { 
-        portfolioId: data.portfolioId, 
-        stockId: data.stockId 
+      this.logger.info("Stock updated", {
+        portfolioId: data.portfolioId,
+        stockId: data.stockId,
       });
       return true;
     } catch (error) {
-      this.logger.error('Failed to update stock', error as Error);
+      this.logger.error("Failed to update stock", error as Error);
       throw error;
     }
   }
@@ -144,13 +151,19 @@ export class PortfolioDataService {
   /**
    * Remove stock from portfolio
    */
-  async removeStockFromPortfolio(portfolioId: string, stockId: string): Promise<boolean> {
+  async removeStockFromPortfolio(
+    portfolioId: string,
+    stockId: string,
+  ): Promise<boolean> {
     try {
       // Simulate API call
-      this.logger.info('Stock removed from portfolio', { portfolioId, stockId });
+      this.logger.info("Stock removed from portfolio", {
+        portfolioId,
+        stockId,
+      });
       return true;
     } catch (error) {
-      this.logger.error('Failed to remove stock', error as Error);
+      this.logger.error("Failed to remove stock", error as Error);
       throw error;
     }
   }
@@ -158,16 +171,19 @@ export class PortfolioDataService {
   /**
    * Execute portfolio rebalancing
    */
-  async executeRebalance(portfolioId: string, recommendations: RebalanceRecommendation[]): Promise<boolean> {
+  async executeRebalance(
+    portfolioId: string,
+    recommendations: RebalanceRecommendation[],
+  ): Promise<boolean> {
     try {
       // Simulate API call
-      this.logger.info('Portfolio rebalanced', { 
-        portfolioId, 
-        recommendationsCount: recommendations.length 
+      this.logger.info("Portfolio rebalanced", {
+        portfolioId,
+        recommendationsCount: recommendations.length,
       });
       return true;
     } catch (error) {
-      this.logger.error('Failed to execute rebalance', error as Error);
+      this.logger.error("Failed to execute rebalance", error as Error);
       throw error;
     }
   }
@@ -175,14 +191,17 @@ export class PortfolioDataService {
   /**
    * Get portfolio performance history
    */
-  getPortfolioPerformance(portfolioId: string, days: number): Observable<PortfolioPerformance[]> {
+  getPortfolioPerformance(
+    portfolioId: string,
+    days: number,
+  ): Observable<PortfolioPerformance[]> {
     // Simulate API call with sample data
     const performance: PortfolioPerformance[] = [];
-    
+
     for (let i = days; i >= 0; i--) {
       const date = new Date();
       date.setDate(date.getDate() - i);
-      
+
       performance.push({
         id: this.generateId(),
         portfolioId,
@@ -191,7 +210,7 @@ export class PortfolioDataService {
         return: Math.random() * 1000,
         returnPercent: Math.random() * 10,
         createdAt: date,
-        updatedAt: date
+        updatedAt: date,
       });
     }
 
@@ -207,37 +226,37 @@ export class PortfolioDataService {
 
     return [
       {
-        id: 'portfolio-1',
-        name: 'Growth Portfolio',
-        description: 'High growth potential stocks',
-        type: 'equity',
+        id: "portfolio-1",
+        name: "Growth Portfolio",
+        description: "High growth potential stocks",
+        type: "equity",
         stocks: [
           {
-            id: 'stock-1',
-            ticker: 'RELIANCE',
-            name: 'Reliance Industries Limited',
-            exchange: 'NSE',
+            id: "stock-1",
+            ticker: "RELIANCE",
+            name: "Reliance Industries Limited",
+            exchange: "NSE",
             weight: 25,
             shares: 100,
             currentPrice: 2450,
             totalValue: 245000,
             notes: [],
             createdAt: new Date(),
-            updatedAt: new Date()
+            updatedAt: new Date(),
           },
           {
-            id: 'stock-2',
-            ticker: 'TCS',
-            name: 'Tata Consultancy Services',
-            exchange: 'NSE',
+            id: "stock-2",
+            ticker: "TCS",
+            name: "Tata Consultancy Services",
+            exchange: "NSE",
             weight: 20,
             shares: 50,
             currentPrice: 3520,
             totalValue: 176000,
             notes: [],
             createdAt: new Date(),
-            updatedAt: new Date()
-          }
+            updatedAt: new Date(),
+          },
         ],
         totalValue: 421000,
         totalReturn: 35000,
@@ -245,27 +264,27 @@ export class PortfolioDataService {
         ownerId: user.uid,
         ownerEmail: user.email,
         createdAt: new Date(),
-        updatedAt: new Date()
+        updatedAt: new Date(),
       },
       {
-        id: 'portfolio-2',
-        name: 'Balanced Portfolio',
-        description: 'Mix of growth and value stocks',
-        type: 'hybrid',
+        id: "portfolio-2",
+        name: "Balanced Portfolio",
+        description: "Mix of growth and value stocks",
+        type: "hybrid",
         stocks: [
           {
-            id: 'stock-3',
-            ticker: 'HDFCBANK',
-            name: 'HDFC Bank Limited',
-            exchange: 'NSE',
+            id: "stock-3",
+            ticker: "HDFCBANK",
+            name: "HDFC Bank Limited",
+            exchange: "NSE",
             weight: 30,
             shares: 150,
             currentPrice: 1680,
             totalValue: 252000,
             notes: [],
             createdAt: new Date(),
-            updatedAt: new Date()
-          }
+            updatedAt: new Date(),
+          },
         ],
         totalValue: 252000,
         totalReturn: 18000,
@@ -273,8 +292,8 @@ export class PortfolioDataService {
         ownerId: user.uid,
         ownerEmail: user.email,
         createdAt: new Date(),
-        updatedAt: new Date()
-      }
+        updatedAt: new Date(),
+      },
     ];
   }
 
