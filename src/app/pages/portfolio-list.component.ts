@@ -319,9 +319,11 @@ import { Portfolio } from "../models/portfolio.model";
   `,
 })
 export class PortfolioListComponent {
-  private portfolioService = inject(PortfolioService);
+  private portfolioService = inject(FirebasePortfolioService);
 
   portfolios = this.portfolioService.getPortfolios();
+  loading = this.portfolioService.getLoading();
+  error = this.portfolioService.getError();
   showCreateModal = signal(false);
   newPortfolioName = "";
   newPortfolioDescription = "";
@@ -345,22 +347,24 @@ export class PortfolioListComponent {
     return avgReturn.toFixed(1);
   }
 
-  createPortfolio(): void {
+  async createPortfolio(): Promise<void> {
     if (this.newPortfolioName.trim()) {
-      this.portfolioService.createPortfolio(
+      const result = await this.portfolioService.createPortfolio(
         this.newPortfolioName.trim(),
         this.newPortfolioDescription.trim(),
       );
 
-      this.newPortfolioName = "";
-      this.newPortfolioDescription = "";
-      this.showCreateModal.set(false);
+      if (result) {
+        this.newPortfolioName = "";
+        this.newPortfolioDescription = "";
+        this.showCreateModal.set(false);
+      }
     }
   }
 
-  deletePortfolio(id: string): void {
+  async deletePortfolio(id: string): Promise<void> {
     if (confirm("Are you sure you want to delete this portfolio?")) {
-      this.portfolioService.deletePortfolio(id);
+      await this.portfolioService.deletePortfolio(id);
     }
   }
 }
