@@ -11,7 +11,14 @@ import { SharePortfolioComponent } from "../components/share-portfolio.component
 @Component({
   selector: "app-portfolio-list",
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, FirebaseSetupComponent, HeaderComponent, SharePortfolioComponent],
+  imports: [
+    CommonModule,
+    RouterModule,
+    FormsModule,
+    FirebaseSetupComponent,
+    HeaderComponent,
+    SharePortfolioComponent,
+  ],
   template: `
     <div class="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
       <!-- Header -->
@@ -23,7 +30,9 @@ import { SharePortfolioComponent } from "../components/share-portfolio.component
           <div class="flex items-center justify-between">
             <div>
               <h2 class="text-2xl font-bold text-slate-900">My Portfolios</h2>
-              <p class="text-slate-600 mt-1">Manage your investment portfolios</p>
+              <p class="text-slate-600 mt-1">
+                Manage your investment portfolios
+              </p>
             </div>
             <button
               (click)="showCreateModal.set(true)"

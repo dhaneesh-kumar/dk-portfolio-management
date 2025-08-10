@@ -14,7 +14,14 @@ import {
   Timestamp,
 } from "firebase/firestore";
 import { db } from "../config/firebase.config";
-import { Portfolio, Stock, StockNote, PortfolioShare, SharePermissions, PortfolioComment } from "../models/portfolio.model";
+import {
+  Portfolio,
+  Stock,
+  StockNote,
+  PortfolioShare,
+  SharePermissions,
+  PortfolioComment,
+} from "../models/portfolio.model";
 import { AuthService } from "./auth.service";
 
 @Injectable({
@@ -88,13 +95,18 @@ export class FirebasePortfolioService {
       // Add shared portfolios
       for (const shareDoc of sharedSnapshot.docs) {
         const shareData = shareDoc.data();
-        const portfolioDoc = await getDoc(doc(db, "portfolios", shareData['portfolioId']));
+        const portfolioDoc = await getDoc(
+          doc(db, "portfolios", shareData["portfolioId"]),
+        );
         if (portfolioDoc.exists()) {
           const portfolioData = portfolioDoc.data();
-          const portfolio = this.convertFirestoreToPortfolio(portfolioDoc.id, portfolioData);
+          const portfolio = this.convertFirestoreToPortfolio(
+            portfolioDoc.id,
+            portfolioData,
+          );
           portfolio.isShared = true;
           portfolio.shareId = shareDoc.id;
-          portfolio.permissions = shareData['permissions'];
+          portfolio.permissions = shareData["permissions"];
           portfolios.push(portfolio);
         }
       }
@@ -145,7 +157,7 @@ export class FirebasePortfolioService {
         createdAt: Timestamp.now(),
         updatedAt: Timestamp.now(),
         isTemplate: false,
-        comments: []
+        comments: [],
       };
 
       const docRef = await addDoc(collection(db, "portfolios"), portfolioData);
@@ -444,19 +456,22 @@ export class FirebasePortfolioService {
       ...data,
       createdAt: data["createdAt"]?.toDate() || new Date(),
       updatedAt: data["updatedAt"]?.toDate() || new Date(),
-      stocks: data["stocks"]?.map((stock: any) => ({
-        ...stock,
-        notes: stock.notes?.map((note: any) => ({
-          ...note,
-          createdAt: note.createdAt?.toDate() || new Date(),
-          updatedAt: note.updatedAt?.toDate() || new Date(),
+      stocks:
+        data["stocks"]?.map((stock: any) => ({
+          ...stock,
+          notes:
+            stock.notes?.map((note: any) => ({
+              ...note,
+              createdAt: note.createdAt?.toDate() || new Date(),
+              updatedAt: note.updatedAt?.toDate() || new Date(),
+            })) || [],
         })) || [],
-      })) || [],
-      comments: data["comments"]?.map((comment: any) => ({
-        ...comment,
-        createdAt: comment.createdAt?.toDate() || new Date(),
-        updatedAt: comment.updatedAt?.toDate() || new Date(),
-      })) || [],
+      comments:
+        data["comments"]?.map((comment: any) => ({
+          ...comment,
+          createdAt: comment.createdAt?.toDate() || new Date(),
+          updatedAt: comment.updatedAt?.toDate() || new Date(),
+        })) || [],
     } as Portfolio;
   }
 
@@ -465,7 +480,7 @@ export class FirebasePortfolioService {
     portfolioId: string,
     email: string,
     permissions: SharePermissions,
-    message?: string
+    message?: string,
   ): Promise<boolean> {
     try {
       if (!db) return false;
@@ -479,16 +494,16 @@ export class FirebasePortfolioService {
         sharedById: user.uid,
         sharedByEmail: user.email,
         permissions,
-        message: message || '',
+        message: message || "",
         createdAt: Timestamp.now(),
-        updatedAt: Timestamp.now()
+        updatedAt: Timestamp.now(),
       };
 
-      await addDoc(collection(db, 'portfolio_shares'), shareData);
-      console.log('✅ Portfolio shared successfully');
+      await addDoc(collection(db, "portfolio_shares"), shareData);
+      console.log("✅ Portfolio shared successfully");
       return true;
     } catch (error) {
-      console.error('❌ Error sharing portfolio:', error);
+      console.error("❌ Error sharing portfolio:", error);
       return false;
     }
   }
@@ -498,19 +513,19 @@ export class FirebasePortfolioService {
       if (!db) return [];
 
       const q = query(
-        collection(db, 'portfolio_shares'),
-        where('portfolioId', '==', portfolioId)
+        collection(db, "portfolio_shares"),
+        where("portfolioId", "==", portfolioId),
       );
       const snapshot = await getDocs(q);
 
-      return snapshot.docs.map(doc => ({
+      return snapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
-        createdAt: doc.data()['createdAt']?.toDate() || new Date(),
-        updatedAt: doc.data()['updatedAt']?.toDate() || new Date(),
+        createdAt: doc.data()["createdAt"]?.toDate() || new Date(),
+        updatedAt: doc.data()["updatedAt"]?.toDate() || new Date(),
       })) as PortfolioShare[];
     } catch (error) {
-      console.error('Error loading portfolio shares:', error);
+      console.error("Error loading portfolio shares:", error);
       return [];
     }
   }
@@ -519,11 +534,11 @@ export class FirebasePortfolioService {
     try {
       if (!db) return false;
 
-      await deleteDoc(doc(db, 'portfolio_shares', shareId));
-      console.log('✅ Portfolio share removed successfully');
+      await deleteDoc(doc(db, "portfolio_shares", shareId));
+      console.log("✅ Portfolio share removed successfully");
       return true;
     } catch (error) {
-      console.error('❌ Error removing portfolio share:', error);
+      console.error("❌ Error removing portfolio share:", error);
       return false;
     }
   }
@@ -531,7 +546,7 @@ export class FirebasePortfolioService {
   // Comments Methods
   async addPortfolioComment(
     portfolioId: string,
-    content: string
+    content: string,
   ): Promise<boolean> {
     try {
       if (!db) return false;
@@ -546,18 +561,18 @@ export class FirebasePortfolioService {
         authorEmail: user.email,
         authorName: user.displayName,
         createdAt: Timestamp.now(),
-        updatedAt: Timestamp.now()
+        updatedAt: Timestamp.now(),
       };
 
-      await addDoc(collection(db, 'portfolio_comments'), commentData);
+      await addDoc(collection(db, "portfolio_comments"), commentData);
 
       // Reload portfolios to include the new comment
       await this.loadPortfolios();
 
-      console.log('✅ Comment added successfully');
+      console.log("✅ Comment added successfully");
       return true;
     } catch (error) {
-      console.error('❌ Error adding comment:', error);
+      console.error("❌ Error adding comment:", error);
       return false;
     }
   }
@@ -567,20 +582,20 @@ export class FirebasePortfolioService {
       if (!db) return [];
 
       const q = query(
-        collection(db, 'portfolio_comments'),
-        where('portfolioId', '==', portfolioId),
-        orderBy('createdAt', 'desc')
+        collection(db, "portfolio_comments"),
+        where("portfolioId", "==", portfolioId),
+        orderBy("createdAt", "desc"),
       );
       const snapshot = await getDocs(q);
 
-      return snapshot.docs.map(doc => ({
+      return snapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
-        createdAt: doc.data()['createdAt']?.toDate() || new Date(),
-        updatedAt: doc.data()['updatedAt']?.toDate() || new Date(),
+        createdAt: doc.data()["createdAt"]?.toDate() || new Date(),
+        updatedAt: doc.data()["updatedAt"]?.toDate() || new Date(),
       })) as PortfolioComment[];
     } catch (error) {
-      console.error('Error loading comments:', error);
+      console.error("Error loading comments:", error);
       return [];
     }
   }

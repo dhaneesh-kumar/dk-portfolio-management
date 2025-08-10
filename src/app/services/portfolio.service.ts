@@ -28,8 +28,8 @@ export class PortfolioService {
     const portfolio: Portfolio = {
       id: this.generateId(),
       name,
-      ownerId: 'sample-user',
-      ownerEmail: 'sample@example.com',
+      ownerId: "sample-user",
+      ownerEmail: "sample@example.com",
       description,
       stocks: [],
       totalValue: 0,
@@ -180,8 +180,8 @@ export class PortfolioService {
       id: "nifty50",
       name: "Nifty 50",
       description: "Top 50 Indian stocks by market cap",
-      ownerId: 'sample-user',
-      ownerEmail: 'sample@example.com',
+      ownerId: "sample-user",
+      ownerEmail: "sample@example.com",
       stocks: [
         {
           id: "reliance",
@@ -265,8 +265,8 @@ export class PortfolioService {
       id: "sensex30",
       name: "Sensex 30",
       description: "BSE Sensex top 30 companies",
-      ownerId: 'sample-user',
-      ownerEmail: 'sample@example.com',
+      ownerId: "sample-user",
+      ownerEmail: "sample@example.com",
       stocks: [
         {
           id: "sensex-reliance",

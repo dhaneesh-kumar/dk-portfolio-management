@@ -1,6 +1,6 @@
-import { inject } from '@angular/core';
-import { CanActivateFn, Router } from '@angular/router';
-import { AuthService } from '../services/auth.service';
+import { inject } from "@angular/core";
+import { CanActivateFn, Router } from "@angular/router";
+import { AuthService } from "../services/auth.service";
 
 export const authGuard: CanActivateFn = (route, state) => {
   const authService = inject(AuthService);
@@ -11,7 +11,7 @@ export const authGuard: CanActivateFn = (route, state) => {
   }
 
   // Redirect to login if not authenticated
-  router.navigate(['/login']);
+  router.navigate(["/login"]);
   return false;
 };
 
@@ -24,6 +24,6 @@ export const guestGuard: CanActivateFn = (route, state) => {
   }
 
   // Redirect to portfolios if already authenticated
-  router.navigate(['/']);
+  router.navigate(["/"]);
   return false;
 };
