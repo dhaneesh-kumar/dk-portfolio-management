@@ -5,7 +5,7 @@ import { BrowserModule } from "@angular/platform-browser";
 import { CoreModule } from "./core/core.module";
 
 // Shared Module
-import { SharedModule } from './shared/shared.module';
+import { SharedModule } from "./shared/shared.module";
 
 // Routing
 import { AppRoutingModule } from "./app-routing.module";

@@ -288,7 +288,9 @@ export class AuthService implements OnDestroy {
 
     const authState$ = fromEventPattern<FirebaseUser | null>(
       (handler) =>
-        onAuthStateChanged(this.firebaseAuth!, handler, (error) => handler(null)),
+        onAuthStateChanged(this.firebaseAuth!, handler, (error) =>
+          handler(null),
+        ),
       (handler, unsubscribe) => unsubscribe(),
     );
 
