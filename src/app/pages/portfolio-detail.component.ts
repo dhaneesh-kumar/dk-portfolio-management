@@ -2,7 +2,7 @@ import { Component, inject, signal, computed } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { RouterModule, ActivatedRoute, Router } from "@angular/router";
 import { FormsModule } from "@angular/forms";
-import { PortfolioService } from "../services/portfolio.service";
+import { FirebasePortfolioService } from "../services/firebase-portfolio.service";
 import { Portfolio, Stock } from "../models/portfolio.model";
 import { PortfolioChartComponent } from "../components/portfolio-chart.component";
 
