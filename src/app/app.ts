@@ -34,7 +34,14 @@ export class App implements OnInit {
   title = 'Portfolio Manager';
 
   ngOnInit() {
-    // Initialize Firebase app if needed
     console.log('🚀 Portfolio Manager App Initialized');
+
+    // Emergency fallback: if loading for more than 5 seconds, redirect to login
+    setTimeout(() => {
+      if (this.authService.getLoading()()) {
+        console.warn('⚠️ App stuck in loading state, forcing redirect to login');
+        window.location.href = '/login';
+      }
+    }, 5000);
   }
 }
