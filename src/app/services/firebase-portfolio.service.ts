@@ -1,4 +1,4 @@
-import { Injectable, signal } from "@angular/core";
+import { Injectable, signal, inject } from "@angular/core";
 import {
   collection,
   doc,
@@ -9,10 +9,13 @@ import {
   deleteDoc,
   query,
   orderBy,
+  where,
+  or,
   Timestamp,
 } from "firebase/firestore";
 import { db } from "../config/firebase.config";
-import { Portfolio, Stock, StockNote } from "../models/portfolio.model";
+import { Portfolio, Stock, StockNote, PortfolioShare, SharePermissions, PortfolioComment } from "../models/portfolio.model";
+import { AuthService } from "./auth.service";
 
 @Injectable({
   providedIn: "root",
