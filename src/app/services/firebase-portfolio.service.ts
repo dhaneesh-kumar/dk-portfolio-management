@@ -94,7 +94,7 @@ export class FirebasePortfolioService {
           const portfolio = this.convertFirestoreToPortfolio(portfolioDoc.id, portfolioData);
           portfolio.isShared = true;
           portfolio.shareId = shareDoc.id;
-          portfolio.permissions = shareData.permissions;
+          portfolio.permissions = shareData['permissions'];
           portfolios.push(portfolio);
         }
       }
