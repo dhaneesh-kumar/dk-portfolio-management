@@ -147,7 +147,7 @@ export class AuthService implements OnDestroy {
   ): Promise<boolean> {
     return this.executeAuthAction(async () => {
       const result = await createUserWithEmailAndPassword(
-        this.auth,
+        this.firebaseAuth!,
         email,
         password,
       );
