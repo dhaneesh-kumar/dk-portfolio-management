@@ -180,6 +180,8 @@ export class PortfolioService {
       id: "nifty50",
       name: "Nifty 50",
       description: "Top 50 Indian stocks by market cap",
+      ownerId: 'sample-user',
+      ownerEmail: 'sample@example.com',
       stocks: [
         {
           id: "reliance",
