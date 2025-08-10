@@ -174,7 +174,7 @@ export class AuthService implements OnDestroy {
    */
   async resetPassword(email: string): Promise<boolean> {
     return this.executeAuthAction(async () => {
-      await sendPasswordResetEmail(this.auth, email);
+      await sendPasswordResetEmail(this.firebaseAuth!, email);
       this.logger.info("Password reset email sent", { email });
       this.notificationService.success(
         "Reset email sent",
