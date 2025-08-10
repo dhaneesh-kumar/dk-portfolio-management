@@ -59,9 +59,9 @@ export class FirebasePortfolioService {
         portfolios.push({
           id: doc.id,
           ...data,
-          createdAt: data.createdAt?.toDate() || new Date(),
-          updatedAt: data.updatedAt?.toDate() || new Date(),
-          stocks: data.stocks?.map((stock: any) => ({
+          createdAt: data['createdAt']?.toDate() || new Date(),
+          updatedAt: data['updatedAt']?.toDate() || new Date(),
+          stocks: data['stocks']?.map((stock: any) => ({
             ...stock,
             notes: stock.notes?.map((note: any) => ({
               ...note,
