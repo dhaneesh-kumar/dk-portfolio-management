@@ -265,6 +265,8 @@ export class PortfolioService {
       id: "sensex30",
       name: "Sensex 30",
       description: "BSE Sensex top 30 companies",
+      ownerId: 'sample-user',
+      ownerEmail: 'sample@example.com',
       stocks: [
         {
           id: "sensex-reliance",
