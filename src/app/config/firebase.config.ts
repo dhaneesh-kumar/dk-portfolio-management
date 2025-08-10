@@ -55,4 +55,4 @@ try {
   );
 }
 
-export { db };
+export { db, auth };
