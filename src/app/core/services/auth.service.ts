@@ -93,6 +93,14 @@ export class AuthService implements OnDestroy {
    * Sign in with Google OAuth
    */
   async signInWithGoogle(): Promise<boolean> {
+    if (!this.firebaseAuth) {
+      this.notificationService.error(
+        "Authentication unavailable",
+        "Firebase authentication is not configured",
+      );
+      return false;
+    }
+
     return this.executeAuthAction(async () => {
       const provider = new GoogleAuthProvider();
       provider.addScope("email");
