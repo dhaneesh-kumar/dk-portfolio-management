@@ -8,7 +8,6 @@ import { Component } from '@angular/core';
       <main>
         <router-outlet></router-outlet>
       </main>
-      <app-notification-toast></app-notification-toast>
     </div>
   `,
   standalone: false
