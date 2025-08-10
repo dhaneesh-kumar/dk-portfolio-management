@@ -369,10 +369,15 @@ export class FirebasePortfolioService {
 
   private initializeSampleData(): void {
     // Fallback sample data when Firebase is not available
+    const user = this.authService.getUser()();
+    if (!user) return;
+
     const nifty50: Portfolio = {
       id: "nifty50",
       name: "Nifty 50",
       description: "Top 50 Indian stocks by market cap",
+      ownerId: user.uid,
+      ownerEmail: user.email,
       stocks: [
         {
           id: "reliance",
