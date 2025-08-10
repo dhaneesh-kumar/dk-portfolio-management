@@ -29,7 +29,7 @@ import { PortfolioShareService } from "./services/portfolio-share.service";
     SharePortfolioComponent,
     PortfolioStatsComponent,
   ],
-  imports: [SharedModule, PortfolioRoutingModule],
+  imports: [CommonModule, FormsModule, RouterModule, PortfolioRoutingModule],
   providers: [
     PortfolioService,
     PortfolioDataService,
