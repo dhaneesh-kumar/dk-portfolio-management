@@ -3,6 +3,7 @@ import { CommonModule } from "@angular/common";
 import { RouterModule } from "@angular/router";
 import { FormsModule } from "@angular/forms";
 import { FirebasePortfolioService } from "../services/firebase-portfolio.service";
+import { MarketDataService } from "../services/market-data.service";
 import { Portfolio } from "../models/portfolio.model";
 import { FirebaseSetupComponent } from "../components/firebase-setup.component";
 import { HeaderComponent } from "../components/header.component";
