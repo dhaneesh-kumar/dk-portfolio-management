@@ -54,6 +54,12 @@ export class FirebasePortfolioService {
       this.loading.set(true);
       this.error.set(null);
 
+      const user = this.authService.getUser()();
+      if (!user) {
+        this.portfolios.set([]);
+        return;
+      }
+
       // Check if Firebase is configured
       if (!db) {
         this.error.set("Firebase not configured. Using sample data.");
@@ -61,11 +67,42 @@ export class FirebasePortfolioService {
         return;
       }
 
-      const q = query(
+      // Load portfolios owned by the user
+      const ownedQuery = query(
         collection(db, "portfolios"),
+        where("ownerId", "==", user.uid),
         orderBy("createdAt", "desc"),
       );
-      const querySnapshot = await getDocs(q);
+      const ownedSnapshot = await getDocs(ownedQuery);
+
+      // Load shared portfolios
+      const sharedQuery = query(
+        collection(db, "portfolio_shares"),
+        where("sharedWithEmail", "==", user.email),
+      );
+      const sharedSnapshot = await getDocs(sharedQuery);
+
+      const portfolios: Portfolio[] = [];
+
+      // Add owned portfolios
+      ownedSnapshot.forEach((doc) => {
+        const data = doc.data();
+        portfolios.push(this.convertFirestoreToPortfolio(doc.id, data));
+      });
+
+      // Add shared portfolios
+      for (const shareDoc of sharedSnapshot.docs) {
+        const shareData = shareDoc.data();
+        const portfolioDoc = await getDoc(doc(db, "portfolios", shareData.portfolioId));
+        if (portfolioDoc.exists()) {
+          const portfolioData = portfolioDoc.data();
+          const portfolio = this.convertFirestoreToPortfolio(portfolioDoc.id, portfolioData);
+          portfolio.isShared = true;
+          portfolio.shareId = shareDoc.id;
+          portfolio.permissions = shareData.permissions;
+          portfolios.push(portfolio);
+        }
+      }
 
       const portfolios: Portfolio[] = [];
       querySnapshot.forEach((doc) => {
