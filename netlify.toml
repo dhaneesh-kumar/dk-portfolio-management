@@ -1,9 +1,5 @@
 # Netlify configuration for Angular Portfolio Management App
 
-[build]
-  publish = "."
-  command = "echo 'No build needed - pre-built files'"
-
 # Redirect rules for Angular SPA routing
 [[redirects]]
   from = "/*"
