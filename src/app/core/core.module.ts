@@ -19,10 +19,6 @@ import { LoadingInterceptor } from "./interceptors/loading.interceptor";
   declarations: [],
   imports: [CommonModule, HttpClientModule],
   providers: [
-    // Guards
-    AuthGuard,
-    GuestGuard,
-
     // Core Services
     AuthService,
     NotificationService,
