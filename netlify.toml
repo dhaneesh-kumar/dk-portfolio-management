@@ -5,7 +5,7 @@
   base = "."
 
   # Directory that contains the deploy-ready HTML files and assets
-  publish = "dist/fusion-angular-tailwind-starter"
+  publish = "dist/fusion-angular-tailwind-starter/browser"
 
   # Default build command
   command = "npm ci && npm run build --prod"
