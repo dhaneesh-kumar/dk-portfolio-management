@@ -198,15 +198,37 @@ export class FirebasePortfolioService {
       const updateData = {
         ...updatedPortfolio,
         updatedAt: Timestamp.now(),
-        createdAt: Timestamp.fromDate(updatedPortfolio.createdAt),
-        stocks: updatedPortfolio.stocks.map((stock) => ({
-          ...stock,
-          notes: stock.notes.map((note) => ({
-            ...note,
-            createdAt: Timestamp.fromDate(note.createdAt),
-            updatedAt: Timestamp.fromDate(note.updatedAt),
-          })),
-        })),
+        createdAt: Timestamp.fromDate(
+          (updatedPortfolio.createdAt as any).toDate
+            ? (updatedPortfolio.createdAt as any).toDate()
+            : updatedPortfolio.createdAt,
+        ),
+        stocks: updatedPortfolio.stocks.map((stock) => {
+          const stockData: any = {
+            ...stock,
+            notes: stock.notes.map((note) => ({
+              ...note,
+              createdAt: Timestamp.fromDate(
+                (note.createdAt as any).toDate
+                  ? (note.createdAt as any).toDate()
+                  : note.createdAt,
+              ),
+              updatedAt: Timestamp.fromDate(
+                (note.updatedAt as any).toDate
+                  ? (note.updatedAt as any).toDate()
+                  : note.updatedAt,
+              ),
+            })),
+          };
+          if (stockData.marketData && stockData.marketData.lastUpdated) {
+            stockData.marketData.lastUpdated = Timestamp.fromDate(
+              (stockData.marketData.lastUpdated as any).toDate
+                ? (stockData.marketData.lastUpdated as any).toDate()
+                : stockData.marketData.lastUpdated,
+            );
+          }
+          return stockData;
+        }),
       };
 
       await updateDoc(portfolioRef, updateData);

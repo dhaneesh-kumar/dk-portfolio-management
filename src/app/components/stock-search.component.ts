@@ -189,82 +189,11 @@ export class StockSearchComponent {
   showDropdown = signal(false);
   isLoading = signal(false);
 
-  popularStocks: StockSearchResult[] = [
-    {
-      symbol: "RELIANCE",
-      name: "Reliance Industries Limited",
-      exchange: "NSE",
-      currency: "INR",
-      type: "Stock",
-    },
-    {
-      symbol: "TCS",
-      name: "Tata Consultancy Services Limited",
-      exchange: "NSE",
-      currency: "INR",
-      type: "Stock",
-    },
-    {
-      symbol: "HDFCBANK",
-      name: "HDFC Bank Limited",
-      exchange: "NSE",
-      currency: "INR",
-      type: "Stock",
-    },
-    {
-      symbol: "INFY",
-      name: "Infosys Limited",
-      exchange: "NSE",
-      currency: "INR",
-      type: "Stock",
-    },
-    {
-      symbol: "ICICIBANK",
-      name: "ICICI Bank Limited",
-      exchange: "NSE",
-      currency: "INR",
-      type: "Stock",
-    },
-    {
-      symbol: "KOTAKBANK",
-      name: "Kotak Mahindra Bank Limited",
-      exchange: "NSE",
-      currency: "INR",
-      type: "Stock",
-    },
-    {
-      symbol: "HINDUNILVR",
-      name: "Hindustan Unilever Limited",
-      exchange: "NSE",
-      currency: "INR",
-      type: "Stock",
-    },
-    {
-      symbol: "BHARTIARTL",
-      name: "Bharti Airtel Limited",
-      exchange: "NSE",
-      currency: "INR",
-      type: "Stock",
-    },
-    {
-      symbol: "ITC",
-      name: "ITC Limited",
-      exchange: "NSE",
-      currency: "INR",
-      type: "Stock",
-    },
-    {
-      symbol: "DMART",
-      name: "Avenue Supermarts Limited",
-      exchange: "NSE",
-      currency: "INR",
-      type: "Stock",
-    },
-  ];
+  popularStocks: StockSearchResult[] = [];
 
   constructor() {
     // Initialize search query
-    this.searchQuery = this.initialValue;
+    this.searchQuery = this.initialValue;  
 
     // Setup search with debouncing
     this.searchSubject

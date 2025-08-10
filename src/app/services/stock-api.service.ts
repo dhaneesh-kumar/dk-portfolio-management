@@ -49,45 +49,65 @@ export class StockApiService {
       return of([]);
     }
 
-    // First try to get results from fallback data (immediate response)
+    // Try fallback data first
     const fallbackResults = this.getFallbackSearchResults(query);
-
     if (fallbackResults.length > 0) {
       return of(fallbackResults);
     }
 
-    // If no fallback matches and API is enabled, try API call
-    if (!this.USE_MOCK_DATA) {
-      const proxyUrl = `${this.CORS_PROXY}${encodeURIComponent(this.YAHOO_SEARCH_API)}?q=${encodeURIComponent(query)}&quotesCount=10&newsCount=0`;
+    // Use localStorage to cache CSV data
+    const cacheKey = 'equity_l_csv_data';
+    const cached = localStorage.getItem(cacheKey);
+    const filterStocks = (stocks: StockSearchResult[]) => {
+      const lowerQuery = query.toLowerCase();
+      return stocks.filter(
+        stock =>
+          stock.symbol.toLowerCase().includes(lowerQuery) ||
+          stock.name.toLowerCase().includes(lowerQuery)
+      ).slice(0, 20);
+    };
 
-      return this.makeHttpRequest<any>(proxyUrl).pipe(
-        map((response) => {
-          if (response && response.quotes) {
-            return response.quotes
-              .filter((quote: any) => quote.typeDisp === "Equity")
-              .map((quote: any) => ({
-                symbol: quote.symbol,
-                name: quote.longname || quote.shortname || quote.symbol,
-                exchange: quote.exchange || "NSE",
-                currency: "INR",
-                type: "Stock",
-              }))
-              .slice(0, 10);
-          }
-          return this.getFallbackSearchResults(query);
-        }),
-        catchError((error) => {
-          console.warn(
-            "API search failed, using fallback data:",
-            error.message,
-          );
-          return of(this.getFallbackSearchResults(query));
-        }),
-      );
+    if (cached) {
+      try {
+        const stocks: StockSearchResult[] = JSON.parse(cached);
+        return of(filterStocks(stocks));
+      } catch {
+        localStorage.removeItem(cacheKey);
+      }
     }
 
-    // Return empty array if no matches in fallback data
-    return of([]);
+    // Fetch and cache CSV if not present
+    return new Observable<StockSearchResult[]>(observer => {
+      fetch('assets/EQUITY_L.csv')
+        .then(response => response.text())
+        .then(csv => {
+          const lines = csv.split('\n').filter(line => line.trim().length > 0);
+          const headers = lines[0].split(',');
+          const symbolIdx = headers.findIndex(h => h.trim().toUpperCase() === 'SYMBOL');
+          const nameIdx = headers.findIndex(h => h.trim().toUpperCase() === 'NAME OF COMPANY');
+          const exchange = 'NSE';
+          const currency = 'INR';
+          const type = 'Stock';
+          const stocks = lines.slice(1).map(line => {
+            const cols = line.split(',');
+            return {
+              symbol: cols[symbolIdx]?.trim(),
+              name: cols[nameIdx]?.trim(),
+              exchange,
+              currency,
+              type,
+            } as StockSearchResult;
+          }).filter(stock => stock.symbol && stock.name);
+          localStorage.setItem(cacheKey, JSON.stringify(stocks));
+          observer.next(filterStocks(stocks));
+          observer.complete();
+        })
+        .catch(err => {
+          console.error('Failed to fetch EQUITY_L CSV:', err);
+          observer.next([]);
+          observer.complete();
+        });
+    });
   }
 
   /**
