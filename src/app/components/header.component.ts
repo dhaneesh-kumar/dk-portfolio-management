@@ -34,7 +34,7 @@ import { AuthService } from '../services/auth.service';
           </div>
 
           <!-- User Menu -->
-          @if (authService.getUser()) {
+          @if (authService.getUser()()) {
             <div class="flex items-center space-x-4">
               <!-- User Info -->
               <div class="flex items-center space-x-3">
