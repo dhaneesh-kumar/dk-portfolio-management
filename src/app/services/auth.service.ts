@@ -13,13 +13,26 @@ import { User } from '../models/portfolio.model';
   providedIn: 'root'
 })
 export class AuthService {
-  private auth = getAuth();
+  private auth: any;
   private user = signal<User | null>(null);
   private loading = signal<boolean>(true);
   private error = signal<string | null>(null);
 
   constructor() {
-    this.initAuthListener();
+    this.initFirebaseAuth();
+  }
+
+  private initFirebaseAuth() {
+    try {
+      this.auth = getAuth();
+      this.initAuthListener();
+    } catch (error) {
+      console.error('❌ Failed to initialize Firebase Auth:', error);
+      // If Firebase fails to initialize, set user to null and stop loading
+      this.user.set(null);
+      this.loading.set(false);
+      this.error.set('Firebase authentication not available');
+    }
   }
 
   getUser() {
