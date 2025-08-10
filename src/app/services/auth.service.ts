@@ -6,6 +6,10 @@ import {
   signOut,
   onAuthStateChanged,
   User as FirebaseUser,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  updateProfile,
+  sendPasswordResetEmail,
 } from "firebase/auth";
 import { User } from "../models/portfolio.model";
 
