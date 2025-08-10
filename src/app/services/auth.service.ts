@@ -39,22 +39,44 @@ export class AuthService {
   }
 
   private initAuthListener() {
-    onAuthStateChanged(this.auth, (firebaseUser: FirebaseUser | null) => {
-      if (firebaseUser) {
-        const user: User = {
-          uid: firebaseUser.uid,
-          email: firebaseUser.email || '',
-          displayName: firebaseUser.displayName || firebaseUser.email || 'User',
-          photoURL: firebaseUser.photoURL || undefined
-        };
-        this.user.set(user);
-        console.log('✅ User authenticated:', user.email);
-      } else {
+    try {
+      // Add a timeout to prevent infinite loading
+      const authTimeout = setTimeout(() => {
+        console.warn('⚠️ Auth initialization timed out, assuming no user');
         this.user.set(null);
-        console.log('📝 User signed out');
-      }
+        this.loading.set(false);
+      }, 5000); // 5 second timeout
+
+      onAuthStateChanged(this.auth, (firebaseUser: FirebaseUser | null) => {
+        clearTimeout(authTimeout); // Clear timeout once auth state is determined
+
+        if (firebaseUser) {
+          const user: User = {
+            uid: firebaseUser.uid,
+            email: firebaseUser.email || '',
+            displayName: firebaseUser.displayName || firebaseUser.email || 'User',
+            photoURL: firebaseUser.photoURL || undefined
+          };
+          this.user.set(user);
+          console.log('✅ User authenticated:', user.email);
+        } else {
+          this.user.set(null);
+          console.log('📝 No user session found');
+        }
+        this.loading.set(false);
+      }, (error) => {
+        clearTimeout(authTimeout);
+        console.error('❌ Auth state change error:', error);
+        this.user.set(null);
+        this.loading.set(false);
+        this.error.set('Authentication initialization failed');
+      });
+    } catch (error) {
+      console.error('❌ Failed to initialize auth listener:', error);
+      this.user.set(null);
       this.loading.set(false);
-    });
+      this.error.set('Authentication service unavailable');
+    }
   }
 
   async signInWithGoogle(): Promise<boolean> {
