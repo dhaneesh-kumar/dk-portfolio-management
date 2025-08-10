@@ -5,6 +5,8 @@ import { FormsModule } from "@angular/forms";
 import { FirebasePortfolioService } from "../services/firebase-portfolio.service";
 import { Portfolio } from "../models/portfolio.model";
 import { FirebaseSetupComponent } from "../components/firebase-setup.component";
+import { HeaderComponent } from "../components/header.component";
+import { SharePortfolioComponent } from "../components/share-portfolio.component";
 
 @Component({
   selector: "app-portfolio-list",
