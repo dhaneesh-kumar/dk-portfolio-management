@@ -88,7 +88,7 @@ export class FirebasePortfolioService {
       // Add shared portfolios
       for (const shareDoc of sharedSnapshot.docs) {
         const shareData = shareDoc.data();
-        const portfolioDoc = await getDoc(doc(db, "portfolios", shareData.portfolioId));
+        const portfolioDoc = await getDoc(doc(db, "portfolios", shareData['portfolioId']));
         if (portfolioDoc.exists()) {
           const portfolioData = portfolioDoc.data();
           const portfolio = this.convertFirestoreToPortfolio(portfolioDoc.id, portfolioData);
