@@ -1,13 +1,14 @@
 import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 import { PortfolioService } from '../services/portfolio.service';
 import { Portfolio } from '../models/portfolio.model';
 
 @Component({
   selector: 'app-portfolio-list',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, FormsModule],
   template: `
     <div class="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
       <!-- Header -->
@@ -18,8 +19,8 @@ import { Portfolio } from '../models/portfolio.model';
               <h1 class="text-3xl font-bold text-slate-900">Portfolio Manager</h1>
               <p class="text-slate-600 mt-1">Manage your stock portfolios with precision</p>
             </div>
-            <button 
-              (click)="showCreateModal = true"
+            <button
+              (click)="showCreateModal.set(true)"
               class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200">
               <svg class="w-5 h-5 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
@@ -142,8 +143,8 @@ import { Portfolio } from '../models/portfolio.model';
             </svg>
             <h3 class="text-xl font-medium text-slate-900 mb-2">No portfolios yet</h3>
             <p class="text-slate-600 mb-6">Create your first portfolio to start tracking your investments</p>
-            <button 
-              (click)="showCreateModal = true"
+            <button
+              (click)="showCreateModal.set(true)"
               class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors">
               Create Your First Portfolio
             </button>
@@ -152,7 +153,7 @@ import { Portfolio } from '../models/portfolio.model';
       </main>
 
       <!-- Create Portfolio Modal -->
-      @if (showCreateModal) {
+      @if (showCreateModal()) {
         <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
           <div class="bg-white rounded-xl max-w-md w-full p-6">
             <h2 class="text-2xl font-bold text-slate-900 mb-4">Create New Portfolio</h2>
@@ -182,7 +183,7 @@ import { Portfolio } from '../models/portfolio.model';
               <div class="flex gap-3">
                 <button 
                   type="button"
-                  (click)="showCreateModal = false"
+                  (click)="showCreateModal.set(false)"
                   class="flex-1 px-4 py-2 text-slate-600 border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors">
                   Cancel
                 </button>
