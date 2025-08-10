@@ -36,12 +36,20 @@ export class App implements OnInit {
   ngOnInit() {
     console.log('🚀 Portfolio Manager App Initialized');
 
-    // Emergency fallback: if loading for more than 5 seconds, redirect to login
+    // Immediate check: if no user after 1 second, redirect to login
+    setTimeout(() => {
+      if (this.authService.getLoading()() || !this.authService.isAuthenticated()) {
+        console.warn('⚠️ No user session detected, redirecting to login');
+        window.location.href = '/login';
+      }
+    }, 1000);
+
+    // Emergency fallback: if still loading after 3 seconds, force redirect
     setTimeout(() => {
       if (this.authService.getLoading()()) {
         console.warn('⚠️ App stuck in loading state, forcing redirect to login');
         window.location.href = '/login';
       }
-    }, 5000);
+    }, 3000);
   }
 }
