@@ -1,8 +1,9 @@
-import { Component, inject, signal, computed } from "@angular/core";
+import { Component, inject, signal, computed, effect } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { RouterModule, ActivatedRoute } from "@angular/router";
 import { FormsModule } from "@angular/forms";
 import { FirebasePortfolioService } from "../services/firebase-portfolio.service";
+import { StockApiService } from "../services/stock-api.service";
 import { Stock, StockNote } from "../models/portfolio.model";
 
 @Component({
@@ -153,11 +154,30 @@ import { Stock, StockNote } from "../models/portfolio.model";
                       />
                     </svg>
                     <h3 class="text-lg font-medium text-slate-900 mb-2">
-                      No Market Data Available
+                      Loading Market Data...
                     </h3>
-                    <p class="text-slate-600">
-                      Market data will be fetched from API integration
+                    <p class="text-slate-600 mb-4">
+                      Fetching real-time market data for {{ stock()!.ticker }}
                     </p>
+                    <button
+                      (click)="refreshMarketData()"
+                      class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
+                    >
+                      <svg
+                        class="w-4 h-4 inline-block mr-2"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                        />
+                      </svg>
+                      Refresh Data
+                    </button>
                   </div>
                 }
               </div>
@@ -391,6 +411,7 @@ import { Stock, StockNote } from "../models/portfolio.model";
 export class StockDetailComponent {
   private route = inject(ActivatedRoute);
   private portfolioService = inject(FirebasePortfolioService);
+  private stockApiService = inject(StockApiService);
 
   stockId = signal<string>("");
   portfolioId = signal<string>("");
@@ -408,6 +429,7 @@ export class StockDetailComponent {
 
   showAddNoteModal = signal(false);
   editingNote = signal<StockNote | null>(null);
+  isLoadingMarketData = signal(false);
 
   noteForm = {
     section: "",
@@ -433,6 +455,14 @@ export class StockDetailComponent {
     this.route.queryParams.subscribe((params) => {
       if (params["portfolio"]) {
         this.portfolioId.set(params["portfolio"]);
+      }
+    });
+
+    // Auto-fetch market data when stock is loaded
+    effect(() => {
+      const currentStock = this.stock();
+      if (currentStock && !currentStock.marketData) {
+        this.fetchMarketData();
       }
     });
   }
@@ -496,5 +526,39 @@ export class StockDetailComponent {
         await this.portfolioService.updatePortfolio(p);
       }
     }
+  }
+
+  async fetchMarketData(): Promise<void> {
+    const currentStock = this.stock();
+    if (!currentStock || this.isLoadingMarketData()) return;
+
+    this.isLoadingMarketData.set(true);
+
+    try {
+      this.stockApiService.getStockQuote(currentStock.ticker).subscribe({
+        next: async (quote) => {
+          if (quote) {
+            const marketData = this.stockApiService.convertToMarketData(quote);
+            await this.portfolioService.updateStockMarketData(
+              this.portfolioId(),
+              currentStock.ticker,
+              marketData
+            );
+          }
+          this.isLoadingMarketData.set(false);
+        },
+        error: (error) => {
+          console.error('Failed to fetch market data:', error);
+          this.isLoadingMarketData.set(false);
+        }
+      });
+    } catch (error) {
+      console.error('Error fetching market data:', error);
+      this.isLoadingMarketData.set(false);
+    }
+  }
+
+  async refreshMarketData(): Promise<void> {
+    await this.fetchMarketData();
   }
 }
