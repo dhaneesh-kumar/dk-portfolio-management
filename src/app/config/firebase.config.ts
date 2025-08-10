@@ -2,7 +2,7 @@ import { initializeApp, FirebaseApp } from "firebase/app";
 import { getFirestore, Firestore } from "firebase/firestore";
 import { getAuth, Auth } from "firebase/auth";
 
-// Firebase configuration
+// Firebase configuration 
 // 🔧 TO ENABLE FIREBASE: Replace these placeholder values with your actual Firebase project config
 // You can get these values from your Firebase project settings in the Firebase Console
 const firebaseConfig = {
