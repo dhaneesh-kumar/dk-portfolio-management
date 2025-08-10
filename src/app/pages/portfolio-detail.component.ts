@@ -527,7 +527,7 @@ import { PortfolioChartComponent } from "../components/portfolio-chart.component
 export class PortfolioDetailComponent {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
-  private portfolioService = inject(PortfolioService);
+  private portfolioService = inject(FirebasePortfolioService);
 
   portfolioId = signal<string>("");
   portfolio = computed(() => {
@@ -556,10 +556,10 @@ export class PortfolioDetailComponent {
     return p.stocks.reduce((sum, stock) => sum + stock.weight, 0);
   }
 
-  updateWeight(stockId: string, event: any): void {
+  async updateWeight(stockId: string, event: any): Promise<void> {
     const weight = parseFloat(event.target.value);
     if (!isNaN(weight)) {
-      this.portfolioService.updateStockWeight(
+      await this.portfolioService.updateStockWeight(
         this.portfolioId(),
         stockId,
         weight,
@@ -567,9 +567,9 @@ export class PortfolioDetailComponent {
     }
   }
 
-  removeStock(stockId: string): void {
+  async removeStock(stockId: string): Promise<void> {
     if (confirm("Are you sure you want to remove this stock?")) {
-      this.portfolioService.removeStockFromPortfolio(
+      await this.portfolioService.removeStockFromPortfolio(
         this.portfolioId(),
         stockId,
       );
