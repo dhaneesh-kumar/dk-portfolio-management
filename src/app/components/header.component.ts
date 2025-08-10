@@ -38,10 +38,10 @@ import { AuthService } from '../services/auth.service';
             <div class="flex items-center space-x-4">
               <!-- User Info -->
               <div class="flex items-center space-x-3">
-                @if (authService.getUser()?.photoURL) {
-                  <img 
-                    [src]="authService.getUser()?.photoURL" 
-                    [alt]="authService.getUser()?.displayName"
+                @if (authService.getUser()()?.photoURL) {
+                  <img
+                    [src]="authService.getUser()()?.photoURL"
+                    [alt]="authService.getUser()()?.displayName"
                     class="w-8 h-8 rounded-full border-2 border-gray-200">
                 } @else {
                   <div class="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
