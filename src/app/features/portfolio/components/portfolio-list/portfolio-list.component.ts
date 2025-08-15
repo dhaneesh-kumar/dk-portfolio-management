@@ -1,7 +1,7 @@
 import { Component, inject, OnInit } from "@angular/core";
 import { Router } from "@angular/router";
 
-import { PortfolioService } from "../../services/portfolio.service";
+import { FirebasePortfolioService } from "../../../../services/firebase-portfolio.service";
 import { LoadingService } from "../../../../core/services/loading.service";
 import { NotificationService } from "../../../../core/services/notification.service";
 
@@ -162,7 +162,7 @@ import { NotificationService } from "../../../../core/services/notification.serv
                 <div class="ml-4">
                   <p class="text-sm font-medium text-slate-600">Portfolios</p>
                   <p class="text-2xl font-bold text-slate-900">
-                    {{ portfolioService.portfolios().length }}
+                    {{ portfolioService.getPortfolios()().length }}
                   </p>
                 </div>
               </div>
@@ -170,10 +170,10 @@ import { NotificationService } from "../../../../core/services/notification.serv
           </div>
 
           <!-- Portfolio Grid -->
-          @if (portfolioService.portfolios().length > 0) {
+          @if (portfolioService.getPortfolios()().length > 0) {
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               @for (
-                portfolio of portfolioService.portfolios();
+                portfolio of portfolioService.getPortfolios()();
                 track portfolio.id
               ) {
                 <div
@@ -244,7 +244,7 @@ import { NotificationService } from "../../../../core/services/notification.serv
   standalone: false,
 })
 export class PortfolioListComponent implements OnInit {
-  readonly portfolioService = inject(PortfolioService);
+  portfolioService = inject(FirebasePortfolioService);
   private readonly router = inject(Router);
   private readonly notificationService = inject(NotificationService);
 

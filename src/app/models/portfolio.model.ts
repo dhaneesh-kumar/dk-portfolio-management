@@ -2,12 +2,20 @@ export interface Stock {
   id: string;
   ticker: string;
   name: string;
+  exchange: string;
+  sector?: string;
   weight: number;
   shares: number;
+  quantity?: number;
   currentPrice: number;
   totalValue: number;
   notes: StockNote[];
   marketData?: MarketData;
+  priceHistory?: PriceHistory[];
+  dividends?: Dividend[];
+  isCashStock?: boolean;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
 export interface StockNote {
@@ -69,20 +77,32 @@ export interface Portfolio {
   id: string;
   name: string;
   description: string;
+  type: "equity" | "debt" | "hybrid" | "index" | "custom";
   stocks: Stock[];
   totalValue: number;
   totalReturn: number;
   totalReturnPercent: number;
+  // Enhanced budget and constraint fields
+  budget: number;
+  maxStocks: number;
+  maxStockAllocationPercent: number;
+  availableCash: number;
+  // Timestamps
   createdAt: Date;
   updatedAt: Date;
+  // Optional fields
   isTemplate?: boolean;
-  // New fields for ownership and sharing
   ownerId: string;
   ownerEmail: string;
   isShared?: boolean;
   shareId?: string;
   permissions?: SharePermissions;
   comments?: PortfolioComment[];
+  tags?: string[];
+  category?: string;
+  riskLevel?: string;
+  targetReturn?: number;
+  rebalanceFrequency?: string;
 }
 
 export interface PortfolioPerformance {
@@ -97,4 +117,31 @@ export interface User {
   email: string;
   displayName: string;
   photoURL?: string;
+}
+
+// Additional interfaces for enhanced functionality
+export interface PriceHistory {
+  id: string;
+  stockId: string;
+  price: number;
+  quantity: number;
+  date: Date;
+  notes?: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface Dividend {
+  id: string;
+  amount: number;
+  exDate: Date;
+  payDate: Date;
+  recordDate?: Date;
+  frequency: string;
+  currency: string;
+  stockId: string;
+  portfolioId: string;
+  notes?: string;
+  createdAt: Date;
+  updatedAt: Date;
 }

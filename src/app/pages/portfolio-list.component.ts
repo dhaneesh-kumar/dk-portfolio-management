@@ -130,10 +130,7 @@ import { HeaderComponent } from "../shared/components/header/header.component";
               <div>
                 <h3 class="text-red-800 font-medium">Error Loading Data</h3>
                 <p class="text-red-700 text-sm mt-1">{{ error() }}</p>
-                <p class="text-red-700 text-sm">
-                  The app is running with sample data. Please configure Firebase
-                  to enable data persistence.
-                </p>
+
               </div>
             </div>
           </div>

@@ -43,9 +43,9 @@ try {
     auth = getAuth(app);
     console.log("✅ Firebase initialized successfully");
   } else {
-    console.warn("⚠️ Firebase not configured. Using sample data mode.");
+    console.warn("⚠️ Firebase not configured. Database features disabled.");
     console.log(
-      "📖 See Firebase setup instructions in the app or check src/app/config/firebase.config.ts",
+      "📖 To enable database features, configure Firebase in src/app/config/firebase.config.ts",
     );
   }
 } catch (error) {

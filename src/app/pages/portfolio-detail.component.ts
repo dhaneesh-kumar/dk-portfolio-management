@@ -645,6 +645,7 @@ export class PortfolioDetailComponent {
       const stockData = {
         ticker: selected.symbol,
         name: selected.name,
+        exchange: selected.exchange,
         weight: this.newStock.weight,
         shares: this.newStock.shares,
         currentPrice: this.newStock.currentPrice,

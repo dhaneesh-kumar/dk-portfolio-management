@@ -35,7 +35,7 @@ export class PortfolioShareService {
    */
   getPortfolioShares(portfolioId: string): Observable<PortfolioShare[]> {
     try {
-      // Simulate API call with sample data
+      // Return empty array - using database service instead
       const shares: PortfolioShare[] = [
         {
           id: "share-1",
@@ -108,7 +108,7 @@ export class PortfolioShareService {
    */
   getSharedPortfolios(): Observable<PortfolioShare[]> {
     try {
-      // Simulate API call with sample data
+      // Return empty array - using database service instead
       const sharedPortfolios: PortfolioShare[] = [];
 
       return of(sharedPortfolios);

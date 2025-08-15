@@ -1,3 +1,70 @@
+/* Quill Editor Styles - must be before Tailwind */
+@import 'quill/dist/quill.snow.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Custom Quill overrides */
+.ql-editor {
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.ql-toolbar {
+  border: 1px solid #e2e8f0;
+  border-bottom: none;
+}
+
+.ql-container {
+  border: 1px solid #e2e8f0;
+  border-top: none;
+}
+
+.ql-editor.ql-blank::before {
+  color: #64748b;
+  font-style: normal;
+}
+
+/* Enhanced Notes styling */
+.prose {
+  max-width: none;
+}
+
+.prose h1, .prose h2, .prose h3, .prose h4, .prose h5, .prose h6 {
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+}
+
+.prose p {
+  margin-bottom: 0.5em;
+}
+
+.prose ul, .prose ol {
+  margin-bottom: 0.5em;
+  padding-left: 1.5em;
+}
+
+.prose blockquote {
+  border-left: 4px solid #e2e8f0;
+  padding-left: 1em;
+  margin: 1em 0;
+  font-style: italic;
+  color: #64748b;
+}
+
+.prose strong {
+  font-weight: 600;
+}
+
+.prose em {
+  font-style: italic;
+}
+
+.prose code {
+  background-color: #f1f5f9;
+  padding: 0.125em 0.25em;
+  border-radius: 0.25rem;
+  font-size: 0.875em;
+}

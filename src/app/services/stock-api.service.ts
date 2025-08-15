@@ -38,8 +38,8 @@ export class StockApiService {
   private readonly YAHOO_SEARCH_API =
     "https://query2.finance.yahoo.com/v1/finance/search";
 
-  // Flag to use mock data when API calls fail
-  private readonly USE_MOCK_DATA = true;
+  // Use fallback data for Indian stocks due to API limitations
+  // In production, implement backend API for real-time data
 
   /**
    * Search for stocks by symbol or company name

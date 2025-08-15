@@ -1,7 +1,7 @@
 import { Component, inject, OnInit, signal } from "@angular/core";
 import { ActivatedRoute, Router } from "@angular/router";
 
-import { PortfolioService } from "../../services/portfolio.service";
+import { FirebasePortfolioService } from "../../../../services/firebase-portfolio.service";
 import { Portfolio } from "../../models/portfolio.model";
 
 @Component({
@@ -346,7 +346,7 @@ import { Portfolio } from "../../models/portfolio.model";
 export class PortfolioDetailComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
-  private readonly portfolioService = inject(PortfolioService);
+  private readonly portfolioService = inject(FirebasePortfolioService);
 
   portfolio = signal<Portfolio | null>(null);
 
@@ -361,7 +361,7 @@ export class PortfolioDetailComponent implements OnInit {
 
   private async loadPortfolio(id: string): Promise<void> {
     const portfolio = await this.portfolioService.getPortfolio(id);
-    this.portfolio.set(portfolio);
+    this.portfolio.set(portfolio as any || null);
   }
 
   getTotalWeight(): number {

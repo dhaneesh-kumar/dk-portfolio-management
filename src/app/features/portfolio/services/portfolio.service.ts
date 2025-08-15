@@ -1,5 +1,5 @@
 import { Injectable, signal, computed, inject } from "@angular/core";
-import { Observable, BehaviorSubject, combineLatest } from "rxjs";
+import { Observable, BehaviorSubject, combineLatest, of } from "rxjs";
 import { map, catchError, finalize } from "rxjs/operators";
 
 import { LoggerService } from "../../../core/services/logger.service";
@@ -7,7 +7,7 @@ import { NotificationService } from "../../../core/services/notification.service
 import { LoadingService } from "../../../core/services/loading.service";
 import { AuthService } from "../../../core/services/auth.service";
 
-import { PortfolioDataService } from "./portfolio-data.service";
+import { FirebasePortfolioService } from "../../../services/firebase-portfolio.service";
 import { PortfolioCalculationService } from "./portfolio-calculation.service";
 
 import {
@@ -29,7 +29,7 @@ export class PortfolioService {
   private readonly notificationService = inject(NotificationService);
   private readonly loadingService = inject(LoadingService);
   private readonly authService = inject(AuthService);
-  private readonly dataService = inject(PortfolioDataService);
+  private readonly dataService = inject(FirebasePortfolioService);
   private readonly calculationService = inject(PortfolioCalculationService);
 
   // State management
@@ -85,11 +85,12 @@ export class PortfolioService {
       this.updateState({ isLoading: true, hasError: false });
       this.loadingService.setLoadingFor(loadingKey, true);
 
-      const portfolios = await this.dataService.getAllPortfolios();
+      await this.dataService.loadPortfolios();
+      const portfolios = this.dataService.getPortfolios()();
 
       // Calculate derived values
       const enrichedPortfolios = portfolios.map((portfolio) =>
-        this.calculationService.calculatePortfolioMetrics(portfolio),
+        this.calculationService.calculatePortfolioMetrics(portfolio as any),
       );
 
       this.portfoliosSubject.next(enrichedPortfolios);
@@ -116,11 +117,11 @@ export class PortfolioService {
     try {
       this.logger.debug("Fetching portfolio", { portfolioId: id });
 
-      const portfolio = await this.dataService.getPortfolioById(id);
+      const portfolio = this.dataService.getPortfolio(id);
 
       if (portfolio) {
         const enrichedPortfolio =
-          this.calculationService.calculatePortfolioMetrics(portfolio);
+          this.calculationService.calculatePortfolioMetrics(portfolio as any);
         this.selectedPortfolioSubject.next(enrichedPortfolio);
         return enrichedPortfolio;
       }
@@ -146,11 +147,10 @@ export class PortfolioService {
         throw new Error("User not authenticated");
       }
 
-      const newPortfolio = await this.dataService.createPortfolio({
-        ...portfolioData,
-        ownerId: user.uid,
-        ownerEmail: user.email,
-      });
+      const newPortfolio = await this.dataService.createPortfolio(
+        portfolioData.name,
+        portfolioData.description
+      );
 
       if (newPortfolio) {
         this.notificationService.success(
@@ -163,7 +163,7 @@ export class PortfolioService {
           portfolioId: newPortfolio.id,
         });
 
-        return newPortfolio;
+        return newPortfolio as any;
       }
 
       return null;
@@ -182,7 +182,16 @@ export class PortfolioService {
     try {
       this.loadingService.setLoadingFor("updatePortfolio", true);
 
-      const success = await this.dataService.updatePortfolio(portfolioData);
+      // Convert UpdatePortfolioDto to Portfolio for Firebase service
+      const portfolio = this.dataService.getPortfolio(portfolioData.id);
+      if (!portfolio) return false;
+
+      const updatedPortfolio = {
+        ...portfolio,
+        ...portfolioData,
+        updatedAt: new Date()
+      };
+      const success = await this.dataService.updatePortfolio(updatedPortfolio);
 
       if (success) {
         this.notificationService.success(
@@ -240,7 +249,17 @@ export class PortfolioService {
     try {
       this.loadingService.setLoadingFor("addStock", true);
 
-      const success = await this.dataService.addStockToPortfolio(stockData);
+      const success = await this.dataService.addStockToPortfolio(
+        stockData.portfolioId,
+        {
+          ticker: stockData.ticker,
+          name: stockData.name,
+          exchange: stockData.exchange,
+          shares: stockData.shares,
+          currentPrice: stockData.price,
+          weight: stockData.weight || 0
+        }
+      );
 
       if (success) {
         this.notificationService.success(
@@ -269,7 +288,11 @@ export class PortfolioService {
    */
   async updateStock(stockData: UpdateStockDto): Promise<boolean> {
     try {
-      const success = await this.dataService.updateStock(stockData);
+      const success = await this.dataService.updateStockWeight(
+        stockData.portfolioId,
+        stockData.stockId,
+        stockData.weight || 0
+      );
 
       if (success) {
         await this.loadPortfolios(); // Refresh the list
@@ -356,10 +379,7 @@ export class PortfolioService {
 
       const recommendations =
         this.calculationService.calculateRebalanceRecommendations(portfolio);
-      const success = await this.dataService.executeRebalance(
-        portfolioId,
-        recommendations,
-      );
+      const success = await this.dataService.rebalancePortfolio(portfolioId);
 
       if (success) {
         this.notificationService.success(
@@ -387,7 +407,8 @@ export class PortfolioService {
     portfolioId: string,
     days: number = 30,
   ): Observable<PortfolioPerformance[]> {
-    return this.dataService.getPortfolioPerformance(portfolioId, days).pipe(
+    // Return mock performance data for now
+    return of([]).pipe(
       catchError((error) => {
         this.handleError("Failed to fetch portfolio performance", error);
         return [];

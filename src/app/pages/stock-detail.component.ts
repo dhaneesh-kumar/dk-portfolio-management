@@ -5,11 +5,12 @@ import { FormsModule } from "@angular/forms";
 import { FirebasePortfolioService } from "../services/firebase-portfolio.service";
 import { StockApiService } from "../services/stock-api.service";
 import { Stock, StockNote } from "../models/portfolio.model";
+import { EnhancedNotesComponent } from "../shared/components/enhanced-notes/enhanced-notes.component";
 
 @Component({
   selector: "app-stock-detail",
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule],
+  imports: [CommonModule, RouterModule, FormsModule, EnhancedNotesComponent],
   template: `
     @if (stock() && portfolio()) {
       <div class="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
@@ -114,7 +115,7 @@ import { Stock, StockNote } from "../models/portfolio.model";
                     <div>
                       <div class="text-sm text-slate-500">Market Cap</div>
                       <div class="text-lg font-semibold text-slate-900">
-                        ₹{{
+                        ���{{
                           stock()!.marketData!.marketCap / 10000000
                             | number: "1.0-0"
                         }}Cr
@@ -182,97 +183,13 @@ import { Stock, StockNote } from "../models/portfolio.model";
                 }
               </div>
 
-              <!-- Personal Notes -->
-              <div
-                class="bg-white rounded-xl shadow-lg border border-slate-200 p-6"
-              >
-                <div class="flex items-center justify-between mb-4">
-                  <h2 class="text-xl font-bold text-slate-900">
-                    Personal Notes
-                  </h2>
-                  <button
-                    (click)="showAddNoteModal.set(true)"
-                    class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
-                  >
-                    <svg
-                      class="w-4 h-4 inline-block mr-2"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                      />
-                    </svg>
-                    Add Note
-                  </button>
-                </div>
-
-                @if (stock()!.notes.length > 0) {
-                  <div class="space-y-4">
-                    @for (note of stock()!.notes; track note.id) {
-                      <div class="border border-slate-200 rounded-lg p-4">
-                        <div class="flex items-center justify-between mb-2">
-                          <h3 class="font-semibold text-slate-900">
-                            {{ note.section }}
-                          </h3>
-                          <div class="flex gap-2">
-                            <button
-                              (click)="editNote(note)"
-                              class="text-blue-600 hover:text-blue-800 text-sm"
-                            >
-                              Edit
-                            </button>
-                            <button
-                              (click)="deleteNote(note.id)"
-                              class="text-red-600 hover:text-red-800 text-sm"
-                            >
-                              Delete
-                            </button>
-                          </div>
-                        </div>
-                        <p class="text-slate-700 whitespace-pre-wrap">
-                          {{ note.content }}
-                        </p>
-                        <div class="text-xs text-slate-500 mt-2">
-                          Updated {{ note.updatedAt | date: "short" }}
-                        </div>
-                      </div>
-                    }
-                  </div>
-                } @else {
-                  <div class="text-center py-8">
-                    <svg
-                      class="w-16 h-16 text-slate-300 mx-auto mb-4"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="1"
-                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                      />
-                    </svg>
-                    <h3 class="text-lg font-medium text-slate-900 mb-2">
-                      No Notes Yet
-                    </h3>
-                    <p class="text-slate-600 mb-4">
-                      Add your thoughts, analysis, and strategy for this stock
-                    </p>
-                    <button
-                      (click)="showAddNoteModal.set(true)"
-                      class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
-                    >
-                      Add Your First Note
-                    </button>
-                  </div>
-                }
-              </div>
+              <!-- Enhanced Personal Notes -->
+              <app-enhanced-notes
+                [notes]="enhancedNotes()"
+                (noteAdded)="onNoteAdded($event)"
+                (noteUpdated)="onNoteUpdated($event)"
+                (noteDeleted)="onNoteDeleted($event)"
+              ></app-enhanced-notes>
             </div>
 
             <!-- Holdings Info Sidebar -->
@@ -334,65 +251,7 @@ import { Stock, StockNote } from "../models/portfolio.model";
           </div>
         </div>
 
-        <!-- Add/Edit Note Modal -->
-        @if (showAddNoteModal() || editingNote()) {
-          <div
-            class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
-          >
-            <div class="bg-white rounded-xl max-w-2xl w-full p-6">
-              <h2 class="text-2xl font-bold text-slate-900 mb-4">
-                {{ editingNote() ? "Edit Note" : "Add Note" }}
-              </h2>
 
-              <form (ngSubmit)="saveNote()" #form="ngForm">
-                <div class="mb-4">
-                  <label class="block text-sm font-medium text-slate-700 mb-2"
-                    >Section</label
-                  >
-                  <input
-                    type="text"
-                    [(ngModel)]="noteForm.section"
-                    name="section"
-                    required
-                    class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    placeholder="e.g., Why I Bought, Moat Analysis, Exit Strategy"
-                  />
-                </div>
-
-                <div class="mb-6">
-                  <label class="block text-sm font-medium text-slate-700 mb-2"
-                    >Content</label
-                  >
-                  <textarea
-                    [(ngModel)]="noteForm.content"
-                    name="content"
-                    required
-                    rows="8"
-                    class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    placeholder="Write your analysis, thoughts, or strategy..."
-                  ></textarea>
-                </div>
-
-                <div class="flex gap-3">
-                  <button
-                    type="button"
-                    (click)="cancelNote()"
-                    class="flex-1 px-4 py-2 text-slate-600 border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    [disabled]="!form.valid"
-                    class="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    {{ editingNote() ? "Update Note" : "Add Note" }}
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        }
       </div>
     } @else {
       <div class="min-h-screen flex items-center justify-center">
@@ -415,26 +274,42 @@ export class StockDetailComponent {
 
   stockId = signal<string>("");
   portfolioId = signal<string>("");
+  refreshTrigger = signal<number>(0);
 
   portfolio = computed(() => {
     const pId = this.portfolioId();
-    return pId ? this.portfolioService.getPortfolio(pId) : null;
+    this.refreshTrigger(); // Force dependency on refresh trigger
+    const allPortfolios = this.portfolioService.getPortfolios(); // Direct dependency on portfolios signal
+    return pId ? allPortfolios().find((p: any) => p.id === pId) : null;
   });
 
   stock = computed(() => {
     const p = this.portfolio();
     const sId = this.stockId();
-    return p && sId ? p.stocks.find((s) => s.id === sId) : null;
+    return p && sId ? p.stocks.find((s: any) => s.id === sId) : null;
   });
 
-  showAddNoteModal = signal(false);
-  editingNote = signal<StockNote | null>(null);
   isLoadingMarketData = signal(false);
 
-  noteForm = {
-    section: "",
-    content: "",
-  };
+  // Convert stock notes to enhanced notes format
+  enhancedNotes = computed(() => {
+    const currentStock = this.stock();
+    console.log('enhancedNotes computed - stock:', currentStock?.ticker, 'notes count:', currentStock?.notes.length);
+    if (!currentStock) return [];
+
+    const notes = currentStock.notes.map((note: any) => ({
+      id: note.id,
+      section: note.section,
+      content: note.content,
+      createdAt: note.createdAt,
+      updatedAt: note.updatedAt,
+      authorId: note.authorId,
+      authorEmail: note.authorEmail
+    }));
+
+    console.log('enhancedNotes computed - returning notes:', notes.map((n: any) => ({ id: n.id, section: n.section,  content: n.content })));
+    return notes;
+  });
 
   commonNoteSections = [
     "Why I Bought",
@@ -472,58 +347,96 @@ export class StockDetailComponent {
   }
 
   startQuickNote(section: string): void {
-    this.noteForm.section = section;
-    this.noteForm.content = "";
-    this.showAddNoteModal.set(true);
+    // This method can be removed or used for backward compatibility
   }
 
-  editNote(note: StockNote): void {
-    this.editingNote.set(note);
-    this.noteForm.section = note.section;
-    this.noteForm.content = note.content;
+  async onNoteAdded(noteData: { section: string; content: string }): Promise<void> {
+    console.log('onNoteAdded called:', noteData);
+    const result = await this.portfolioService.addStockNote(
+      this.portfolioId(),
+      this.stockId(),
+      noteData.section,
+      noteData.content,
+    );
+
+    console.log('addStockNote result:', result);
+    if (result) {
+      // Force UI refresh
+      this.refreshTrigger.update(val => val + 1);
+    } else {
+      console.error('Failed to add note');
+    }
   }
 
-  async saveNote(): Promise<void> {
-    if (this.noteForm.section.trim() && this.noteForm.content.trim()) {
-      const editing = this.editingNote();
-      let result = false;
+  async onNoteUpdated(noteData: { id: string; section: string; content: string }): Promise<void> {
+    console.log('onNoteUpdated called:', noteData);
+    const portfolio = this.portfolio();
+    const stock = this.stock();
 
-      if (editing) {
-        result = await this.portfolioService.updateStockNote(
-          this.portfolioId(),
-          this.stockId(),
-          editing.id,
-          this.noteForm.content.trim(),
-        );
-      } else {
-        result = await this.portfolioService.addStockNote(
-          this.portfolioId(),
-          this.stockId(),
-          this.noteForm.section.trim(),
-          this.noteForm.content.trim(),
-        );
-      }
+    if (portfolio && stock) {
+      const noteIndex = stock.notes.findIndex((n: any) => n.id === noteData.id);
+      if (noteIndex !== -1) {
+        console.log('Found note to update at index:', noteIndex);
+        // Create a new portfolio object to trigger reactivity
+        const updatedPortfolio = {
+          ...portfolio,
+          stocks: portfolio.stocks.map((s: any) =>
+            s.id === stock.id
+              ? {
+                  ...s,
+                  notes: s.notes.map((n: any) =>
+                    n.id === noteData.id
+                      ? {
+                          ...n,
+                          section: noteData.section,
+                          content: noteData.content,
+                          updatedAt: new Date()
+                        }
+                      : n
+                  )
+                }
+              : s
+          )
+        };
 
-      if (result) {
-        this.cancelNote();
+        const result = await this.portfolioService.updatePortfolio(updatedPortfolio);
+        console.log('updatePortfolio result:', result);
+        if (result) {
+          // Force UI refresh
+          this.refreshTrigger.update(val => val + 1);
+        }
       }
     }
   }
 
-  cancelNote(): void {
-    this.showAddNoteModal.set(false);
-    this.editingNote.set(null);
-    this.noteForm.section = "";
-    this.noteForm.content = "";
+  async onNoteDeleted(noteId: string): Promise<void> {
+    this.deleteNote(noteId);
   }
 
   async deleteNote(noteId: string): Promise<void> {
-    if (confirm("Are you sure you want to delete this note?")) {
-      const p = this.portfolio();
-      const s = this.stock();
-      if (p && s) {
-        s.notes = s.notes.filter((n) => n.id !== noteId);
-        await this.portfolioService.updatePortfolio(p);
+    console.log('deleteNote called:', noteId);
+    const portfolio = this.portfolio();
+    const stock = this.stock();
+    if (portfolio && stock) {
+      console.log('Found portfolio and stock for deletion');
+      // Create a new portfolio object to trigger reactivity
+      const updatedPortfolio = {
+        ...portfolio,
+        stocks: portfolio.stocks.map((s: any) =>
+          s.id === stock.id
+            ? {
+                ...s,
+                notes: s.notes.filter((n: any) => n.id !== noteId)
+              }
+            : s
+        )
+      };
+
+      const result = await this.portfolioService.updatePortfolio(updatedPortfolio);
+      console.log('deleteNote updatePortfolio result:', result);
+      if (result) {
+        // Force UI refresh
+        this.refreshTrigger.update(val => val + 1);
       }
     }
   }

@@ -8,6 +8,12 @@ export interface Portfolio extends OwnedEntity {
   totalValue: number;
   totalReturn: number;
   totalReturnPercent: number;
+  // Budget and constraint fields
+  budget: number;
+  maxStocks: number;
+  maxStockAllocationPercent: number;
+  availableCash: number;
+  // Existing optional fields
   isTemplate?: boolean;
   isShared?: boolean;
   shareId?: string;
@@ -23,7 +29,7 @@ export interface Portfolio extends OwnedEntity {
 export interface Stock extends BaseEntity {
   ticker: string;
   name: string;
-  exchange: string;
+  exchange?: string;
   sector?: string;
   industry?: string;
   weight: number;
@@ -39,6 +45,10 @@ export interface Stock extends BaseEntity {
   marketData?: MarketData;
   dividends?: Dividend[];
   transactions?: Transaction[];
+  // New fields for manual management
+  priceHistory: PriceHistory[];
+  quantity: number;
+  isCashStock?: boolean;
 }
 
 export interface StockNote extends BaseEntity {
@@ -77,6 +87,9 @@ export interface Dividend extends BaseEntity {
   recordDate?: Date;
   frequency: DividendFrequency;
   currency: string;
+  stockId: string;
+  portfolioId: string;
+  notes?: string;
 }
 
 export interface Transaction extends BaseEntity {
@@ -123,6 +136,15 @@ export interface PortfolioShare extends BaseEntity {
   message?: string;
   expiresAt?: Date;
   isActive: boolean;
+}
+
+// New interfaces for enhanced functionality
+export interface PriceHistory extends BaseEntity {
+  stockId: string;
+  price: number;
+  quantity: number;
+  date: Date;
+  notes?: string;
 }
 
 export interface PortfolioPerformance extends BaseEntity {
@@ -193,6 +215,9 @@ export interface CreatePortfolioDto {
   name: string;
   description: string;
   type: PortfolioType;
+  budget: number;
+  maxStocks: number;
+  maxStockAllocationPercent: number;
   category?: string;
   tags?: string[];
   riskLevel?: RiskLevel;
@@ -212,6 +237,35 @@ export interface AddStockDto {
   shares: number;
   price: number;
   weight?: number;
+  allocationPercent: number;
+  quantity: number;
+  isCashStock?: boolean;
+}
+
+export interface BatchPriceUpdateDto {
+  portfolioId: string;
+  stockUpdates: {
+    stockId: string;
+    price: number;
+    quantity?: number;
+  }[];
+  notes?: string;
+}
+
+export interface AddDividendDto {
+  portfolioId: string;
+  stockId: string;
+  amount: number;
+  exDate: Date;
+  payDate: Date;
+  frequency: DividendFrequency;
+  notes?: string;
+}
+
+export interface UpdatePortfolioBudgetDto {
+  portfolioId: string;
+  additionalAmount: number;
+  notes?: string;
 }
 
 export interface UpdateStockDto {

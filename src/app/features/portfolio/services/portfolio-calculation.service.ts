@@ -4,12 +4,91 @@ import {
   Portfolio,
   Stock,
   RebalanceRecommendation,
+  PriceHistory,
+  AddStockDto,
 } from "../models/portfolio.model";
 import { LoggerService } from "../../../core/services/logger.service";
 
 @Injectable()
 export class PortfolioCalculationService {
   private readonly logger = inject(LoggerService);
+
+  /**
+   * Calculate maximum number of stocks based on allocation constraints
+   */
+  calculateMaxStocksAllowed(portfolio: Portfolio): number {
+    if (portfolio.maxStockAllocationPercent <= 0) return portfolio.maxStocks;
+
+    // Calculate based on minimum allocation percentage
+    const maxBasedOnAllocation = Math.floor(100 / portfolio.maxStockAllocationPercent);
+    return Math.min(portfolio.maxStocks, maxBasedOnAllocation);
+  }
+
+  /**
+   * Validate stock allocation percentage
+   */
+  validateStockAllocation(portfolio: Portfolio, allocationPercent: number, excludeStockId?: string): {
+    isValid: boolean;
+    currentTotalAllocation: number;
+    remainingAllocation: number;
+    maxAllowedForStock: number;
+  } {
+    const currentTotalAllocation = portfolio.stocks
+      .filter(stock => !excludeStockId || stock.id !== excludeStockId)
+      .reduce((sum, stock) => sum + (stock.weight || 0), 0);
+
+    const remainingAllocation = 100 - currentTotalAllocation;
+    const maxAllowedForStock = Math.min(portfolio.maxStockAllocationPercent, remainingAllocation);
+
+    return {
+      isValid: allocationPercent <= maxAllowedForStock && allocationPercent > 0,
+      currentTotalAllocation,
+      remainingAllocation,
+      maxAllowedForStock
+    };
+  }
+
+  /**
+   * Calculate suggested number of shares based on allocation percentage
+   */
+  calculateSharesFromAllocation(portfolio: Portfolio, stockPrice: number, allocationPercent: number): {
+    suggestedShares: number;
+    estimatedValue: number;
+    actualAllocation: number;
+  } {
+    const targetValue = (portfolio.budget * allocationPercent) / 100;
+    const suggestedShares = Math.floor(targetValue / stockPrice);
+    const estimatedValue = suggestedShares * stockPrice;
+    const actualAllocation = portfolio.budget > 0 ? (estimatedValue / portfolio.budget) * 100 : 0;
+
+    return {
+      suggestedShares,
+      estimatedValue,
+      actualAllocation
+    };
+  }
+
+  /**
+   * Calculate portfolio cash management
+   */
+  calculateCashPosition(portfolio: Portfolio): {
+    totalInvested: number;
+    availableCash: number;
+    cashAllocationPercent: number;
+  } {
+    const totalInvested = portfolio.stocks
+      .filter(stock => !stock.isCashStock)
+      .reduce((sum, stock) => sum + (stock.quantity * stock.currentPrice), 0);
+
+    const availableCash = portfolio.budget - totalInvested;
+    const cashAllocationPercent = portfolio.budget > 0 ? (availableCash / portfolio.budget) * 100 : 0;
+
+    return {
+      totalInvested,
+      availableCash,
+      cashAllocationPercent
+    };
+  }
 
   /**
    * Calculate portfolio metrics and totals
@@ -32,10 +111,16 @@ export class PortfolioCalculationService {
         enrichedPortfolio.totalReturn,
       );
 
-      // Update stock total values
+      // Update cash position
+      const cashPosition = this.calculateCashPosition(portfolio);
+      enrichedPortfolio.availableCash = cashPosition.availableCash;
+
+      // Update stock total values and ensure weight calculations
       enrichedPortfolio.stocks = portfolio.stocks.map((stock) => ({
         ...stock,
         totalValue: this.calculateStockValue(stock),
+        weight: enrichedPortfolio.totalValue > 0 ?
+          (this.calculateStockValue(stock) / enrichedPortfolio.totalValue) * 100 : 0
       }));
 
       this.logger.debug("Portfolio metrics calculated", {
@@ -149,9 +234,9 @@ export class PortfolioCalculationService {
    */
   calculateSectorAllocation(stocks: Stock[]): { [sector: string]: number } {
     const sectorAllocation: { [sector: string]: number } = {};
-    const totalValue = this.calculateTotalValue(stocks);
+    const totalValue = this.calculateTotalValue(stocks.filter(s => !s.isCashStock));
 
-    for (const stock of stocks) {
+    for (const stock of stocks.filter(s => !s.isCashStock)) {
       const sector = stock.sector || "Unknown";
       const stockValue = this.calculateStockValue(stock);
       const percentage = totalValue > 0 ? (stockValue / totalValue) * 100 : 0;
@@ -176,7 +261,69 @@ export class PortfolioCalculationService {
   }
 
   private calculateStockValue(stock: Stock): number {
-    return stock.shares * stock.currentPrice;
+    return (stock.quantity || stock.shares) * stock.currentPrice;
+  }
+
+  /**
+   * Add price history entry
+   */
+  addPriceHistory(stock: Stock, price: number, quantity: number, notes?: string): PriceHistory {
+    const historyEntry: PriceHistory = {
+      id: this.generateId(),
+      stockId: stock.id!,
+      price,
+      quantity,
+      date: new Date(),
+      notes,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+
+    if (!stock.priceHistory) {
+      stock.priceHistory = [];
+    }
+
+    stock.priceHistory.push(historyEntry);
+    return historyEntry;
+  }
+
+  /**
+   * Get price history for analysis
+   */
+  getPriceHistoryAnalysis(stock: Stock): {
+    averagePrice: number;
+    priceRange: { min: number; max: number };
+    priceChange: number;
+    priceChangePercent: number;
+  } {
+    if (!stock.priceHistory || stock.priceHistory.length === 0) {
+      return {
+        averagePrice: stock.currentPrice,
+        priceRange: { min: stock.currentPrice, max: stock.currentPrice },
+        priceChange: 0,
+        priceChangePercent: 0
+      };
+    }
+
+    const prices = stock.priceHistory.map(h => h.price);
+    const averagePrice = prices.reduce((sum, price) => sum + price, 0) / prices.length;
+    const minPrice = Math.min(...prices);
+    const maxPrice = Math.max(...prices);
+
+    const oldestPrice = stock.priceHistory[0].price;
+    const priceChange = stock.currentPrice - oldestPrice;
+    const priceChangePercent = oldestPrice > 0 ? (priceChange / oldestPrice) * 100 : 0;
+
+    return {
+      averagePrice,
+      priceRange: { min: minPrice, max: maxPrice },
+      priceChange,
+      priceChangePercent
+    };
+  }
+
+  private generateId(): string {
+    return Math.random().toString(36).substr(2, 9);
   }
 
   private calculateTotalReturn(stocks: Stock[]): number {
@@ -232,5 +379,28 @@ export class PortfolioCalculationService {
   private calculateMaxDrawdown(stocks: Stock[]): number {
     // Simplified max drawdown calculation
     return Math.random() * 20 + 5; // Random demo data between 5-25%
+  }
+
+  /**
+   * Create cash stock for portfolio
+   */
+  createCashStock(portfolioId: string, cashAmount: number): Stock {
+    return {
+      id: this.generateId(),
+      ticker: 'CASH',
+      name: 'Cash',
+      exchange: 'N/A',
+      sector: 'Cash',
+      weight: 0,
+      shares: cashAmount,
+      quantity: cashAmount,
+      currentPrice: 1,
+      totalValue: cashAmount,
+      notes: [],
+      priceHistory: [],
+      isCashStock: true,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
   }
 }

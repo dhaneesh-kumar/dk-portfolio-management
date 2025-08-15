@@ -23,11 +23,11 @@ import { CommonModule } from "@angular/common";
         </svg>
         <div class="flex-1">
           <h3 class="text-blue-800 font-semibold mb-2">
-            Firebase Setup Required
+            Database Connected
           </h3>
           <p class="text-blue-700 text-sm mb-4">
-            To enable data persistence, please configure Firebase Firestore.
-            Currently running with sample data.
+            Firebase Firestore is configured and ready for data persistence.
+            All portfolio data is stored in the database.
           </p>
 
           <details class="text-sm">

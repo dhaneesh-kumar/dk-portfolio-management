@@ -32,7 +32,7 @@ export class FirebasePortfolioService {
   private authService = inject(AuthService);
   private portfolios = signal<Portfolio[]>([]);
   private loading = signal<boolean>(false);
-  private error = signal<string | null>(null);
+  error = signal<string | null>(null);
 
   constructor() {
     // Load portfolios when user authentication state changes
@@ -52,6 +52,23 @@ export class FirebasePortfolioService {
     return this.error.asReadonly();
   }
 
+  // Add computed properties for compatibility
+  isLoading() {
+    return this.loading();
+  }
+
+  totalPortfolioValue() {
+    return this.portfolios().reduce((sum, portfolio) => sum + portfolio.totalValue, 0);
+  }
+
+  averageReturn() {
+    const portfolios = this.portfolios();
+    if (portfolios.length === 0) return 0;
+
+    const totalReturn = portfolios.reduce((sum, p) => sum + p.totalReturnPercent, 0);
+    return totalReturn / portfolios.length;
+  }
+
   async loadPortfolios(): Promise<void> {
     try {
       this.loading.set(true);
@@ -65,8 +82,7 @@ export class FirebasePortfolioService {
 
       // Check if Firebase is configured
       if (!db) {
-        this.error.set("Firebase not configured. Using sample data.");
-        // this.initializeSampleData();
+        this.error.set("Firebase not configured. Please set up Firebase to store data.");
         return;
       }
 
@@ -120,8 +136,7 @@ export class FirebasePortfolioService {
       this.error.set(
         "Failed to load portfolios. Please check your Firebase configuration.",
       );
-      // Fallback to sample data if Firebase fails
-      // this.initializeSampleData();
+      // Firebase configuration needed to store data
     } finally {
       this.loading.set(false);
     }
@@ -134,6 +149,9 @@ export class FirebasePortfolioService {
   async createPortfolio(
     name: string,
     description: string,
+    budget: number = 100000,
+    maxStocks: number = 15,
+    maxStockAllocationPercent: number = 20
   ): Promise<Portfolio | null> {
     try {
       this.loading.set(true);
@@ -151,10 +169,16 @@ export class FirebasePortfolioService {
       const portfolioData = {
         name,
         description,
+        type: 'custom' as const,
         stocks: [],
         totalValue: 0,
         totalReturn: 0,
         totalReturnPercent: 0,
+        // Enhanced fields for manual management
+        budget: budget,
+        maxStocks: maxStocks,
+        maxStockAllocationPercent: maxStockAllocationPercent,
+        availableCash: budget, // Initial cash = budget
         ownerId: user.uid,
         ownerEmail: user.email,
         createdAt: Timestamp.now(),
@@ -233,16 +257,19 @@ export class FirebasePortfolioService {
 
       await updateDoc(portfolioRef, updateData);
 
-      this.portfolios.update((portfolios) =>
-        portfolios.map((p) =>
+      console.log('updatePortfolio - updating local portfolios signal');
+      this.portfolios.update((portfolios) => {
+        const newPortfolios = portfolios.map((p) =>
           p.id === updatedPortfolio.id
             ? {
                 ...updatedPortfolio,
                 updatedAt: new Date(),
               }
             : p,
-        ),
-      );
+        );
+        console.log('updatePortfolio - portfolios updated, total:', newPortfolios.length);
+        return newPortfolios;
+      });
 
       return true;
     } catch (err) {
@@ -364,8 +391,20 @@ export class FirebasePortfolioService {
       updatedAt: new Date(),
     };
 
-    stock.notes.push(note);
-    return await this.updatePortfolio(portfolio);
+    // Create a new portfolio object to trigger reactivity
+    const updatedPortfolio = {
+      ...portfolio,
+      stocks: portfolio.stocks.map(s =>
+        s.id === stockId
+          ? {
+              ...s,
+              notes: [...s.notes, note]
+            }
+          : s
+      )
+    };
+
+    return await this.updatePortfolio(updatedPortfolio);
   }
 
   async updateStockNote(
@@ -460,76 +499,7 @@ export class FirebasePortfolioService {
     return Math.random().toString(36).substr(2, 9);
   }
 
-  private initializeSampleData(): void {
-    // Fallback sample data when Firebase is not available
-    const user = this.authService.user();
-    if (!user) return;
-
-    const nifty50: Portfolio = {
-      id: "nifty50",
-      name: "Nifty 50",
-      description: "Top 50 Indian stocks by market cap",
-      ownerId: user.uid,
-      ownerEmail: user.email,
-      stocks: [
-        {
-          id: "reliance",
-          ticker: "RELIANCE",
-          name: "Reliance Industries Ltd",
-          weight: 10.5,
-          shares: 100,
-          currentPrice: 2450.5,
-          totalValue: 245050,
-          notes: [],
-          marketData: {
-            price: 2450.5,
-            change: 24.3,
-            changePercent: 1.0,
-            pe: 28.5,
-            bookValue: 1250.0,
-            eps: 86.0,
-            dividendYield: 0.34,
-            debt: 2.1,
-            marketCap: 16500000,
-            volume: 2500000,
-            lastUpdated: new Date(),
-          },
-        },
-        {
-          id: "tcs",
-          ticker: "TCS",
-          name: "Tata Consultancy Services",
-          weight: 8.2,
-          shares: 50,
-          currentPrice: 3850.75,
-          totalValue: 192537.5,
-          notes: [],
-          marketData: {
-            price: 3850.75,
-            change: -15.25,
-            changePercent: -0.39,
-            pe: 32.1,
-            bookValue: 125.5,
-            eps: 120.0,
-            dividendYield: 1.8,
-            debt: 0.1,
-            marketCap: 14200000,
-            volume: 1800000,
-            lastUpdated: new Date(),
-          },
-        },
-      ],
-      totalValue: 437587.5,
-      totalReturn: 35006.6,
-      totalReturnPercent: 8.0,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      isTemplate: true,
-      comments: [],
-    };
-
-    this.portfolios.set([nifty50]);
-  }
+  // Sample data removed - all data now comes from Firebase database
 
   private convertFirestoreToPortfolio(id: string, data: any): Portfolio {
     return {

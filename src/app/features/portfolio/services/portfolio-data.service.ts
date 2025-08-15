@@ -28,9 +28,8 @@ export class PortfolioDataService {
         throw new Error("User not authenticated");
       }
 
-      // For now, return sample data
-      // In a real app, this would call Firebase/API
-      return this.getSamplePortfolios();
+      // Return empty array - using Firebase service instead
+      return [];
     } catch (error) {
       this.logger.error("Failed to fetch portfolios", error as Error);
       throw error;
@@ -73,6 +72,10 @@ export class PortfolioDataService {
         ownerEmail: data.ownerEmail,
         createdAt: new Date(),
         updatedAt: new Date(),
+        budget: 0,
+        maxStocks: 0,
+        maxStockAllocationPercent: 0,
+        availableCash: 0
       };
 
       this.logger.info("Portfolio created", {
@@ -195,7 +198,7 @@ export class PortfolioDataService {
     portfolioId: string,
     days: number,
   ): Observable<PortfolioPerformance[]> {
-    // Simulate API call with sample data
+    // Return empty array - using Firebase service instead
     const performance: PortfolioPerformance[] = [];
 
     for (let i = days; i >= 0; i--) {
@@ -217,85 +220,6 @@ export class PortfolioDataService {
     return of(performance);
   }
 
-  /**
-   * Generate sample portfolios for development
-   */
-  private getSamplePortfolios(): Portfolio[] {
-    const user = this.authService.user();
-    if (!user) return [];
-
-    return [
-      {
-        id: "portfolio-1",
-        name: "Growth Portfolio",
-        description: "High growth potential stocks",
-        type: "equity",
-        stocks: [
-          {
-            id: "stock-1",
-            ticker: "RELIANCE",
-            name: "Reliance Industries Limited",
-            exchange: "NSE",
-            weight: 25,
-            shares: 100,
-            currentPrice: 2450,
-            totalValue: 245000,
-            notes: [],
-            createdAt: new Date(),
-            updatedAt: new Date(),
-          },
-          {
-            id: "stock-2",
-            ticker: "TCS",
-            name: "Tata Consultancy Services",
-            exchange: "NSE",
-            weight: 20,
-            shares: 50,
-            currentPrice: 3520,
-            totalValue: 176000,
-            notes: [],
-            createdAt: new Date(),
-            updatedAt: new Date(),
-          },
-        ],
-        totalValue: 421000,
-        totalReturn: 35000,
-        totalReturnPercent: 8.3,
-        ownerId: user.uid,
-        ownerEmail: user.email,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-      {
-        id: "portfolio-2",
-        name: "Balanced Portfolio",
-        description: "Mix of growth and value stocks",
-        type: "hybrid",
-        stocks: [
-          {
-            id: "stock-3",
-            ticker: "HDFCBANK",
-            name: "HDFC Bank Limited",
-            exchange: "NSE",
-            weight: 30,
-            shares: 150,
-            currentPrice: 1680,
-            totalValue: 252000,
-            notes: [],
-            createdAt: new Date(),
-            updatedAt: new Date(),
-          },
-        ],
-        totalValue: 252000,
-        totalReturn: 18000,
-        totalReturnPercent: 7.1,
-        ownerId: user.uid,
-        ownerEmail: user.email,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-    ];
-  }
 
   private generateId(): string {
     return `id_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;

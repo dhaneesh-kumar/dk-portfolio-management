@@ -13,7 +13,7 @@ export class PortfolioService {
   private portfolios = signal<Portfolio[]>([]);
 
   constructor() {
-    this.initializeSampleData();
+    // Remove sample data - using database now
   }
 
   getPortfolios() {
@@ -31,10 +31,15 @@ export class PortfolioService {
       ownerId: "sample-user",
       ownerEmail: "sample@example.com",
       description,
+      type: "custom",
       stocks: [],
       totalValue: 0,
       totalReturn: 0,
       totalReturnPercent: 0,
+      budget: 100000,
+      maxStocks: 15,
+      maxStockAllocationPercent: 20,
+      availableCash: 100000,
       createdAt: new Date(),
       updatedAt: new Date(),
     };
@@ -175,154 +180,5 @@ export class PortfolioService {
     return Math.random().toString(36).substr(2, 9);
   }
 
-  private initializeSampleData(): void {
-    const nifty50: Portfolio = {
-      id: "nifty50",
-      name: "Nifty 50",
-      description: "Top 50 Indian stocks by market cap",
-      ownerId: "sample-user",
-      ownerEmail: "sample@example.com",
-      stocks: [
-        {
-          id: "reliance",
-          ticker: "RELIANCE",
-          name: "Reliance Industries Ltd",
-          weight: 10.5,
-          shares: 100,
-          currentPrice: 2450.5,
-          totalValue: 245050,
-          notes: [],
-          marketData: {
-            price: 2450.5,
-            change: 24.3,
-            changePercent: 1.0,
-            pe: 28.5,
-            bookValue: 1250.0,
-            eps: 86.0,
-            dividendYield: 0.34,
-            debt: 2.1,
-            marketCap: 16500000,
-            volume: 2500000,
-            lastUpdated: new Date(),
-          },
-        },
-        {
-          id: "tcs",
-          ticker: "TCS",
-          name: "Tata Consultancy Services",
-          weight: 8.2,
-          shares: 50,
-          currentPrice: 3850.75,
-          totalValue: 192537.5,
-          notes: [],
-          marketData: {
-            price: 3850.75,
-            change: -15.25,
-            changePercent: -0.39,
-            pe: 32.1,
-            bookValue: 125.5,
-            eps: 120.0,
-            dividendYield: 1.8,
-            debt: 0.1,
-            marketCap: 14200000,
-            volume: 1800000,
-            lastUpdated: new Date(),
-          },
-        },
-        {
-          id: "hdfc-bank",
-          ticker: "HDFCBANK",
-          name: "HDFC Bank Ltd",
-          weight: 7.8,
-          shares: 150,
-          currentPrice: 1685.2,
-          totalValue: 252780,
-          notes: [],
-          marketData: {
-            price: 1685.2,
-            change: 8.45,
-            changePercent: 0.5,
-            pe: 18.5,
-            bookValue: 450.25,
-            eps: 91.2,
-            dividendYield: 1.2,
-            debt: 12.5,
-            marketCap: 12800000,
-            volume: 3200000,
-            lastUpdated: new Date(),
-          },
-        },
-      ],
-      totalValue: 690367.5,
-      totalReturn: 55229.4,
-      totalReturnPercent: 8.0,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      isTemplate: true,
-    };
-
-    const sensex30: Portfolio = {
-      id: "sensex30",
-      name: "Sensex 30",
-      description: "BSE Sensex top 30 companies",
-      ownerId: "sample-user",
-      ownerEmail: "sample@example.com",
-      stocks: [
-        {
-          id: "sensex-reliance",
-          ticker: "RELIANCE",
-          name: "Reliance Industries Ltd",
-          weight: 12.0,
-          shares: 80,
-          currentPrice: 2450.5,
-          totalValue: 196040,
-          notes: [],
-          marketData: {
-            price: 2450.5,
-            change: 24.3,
-            changePercent: 1.0,
-            pe: 28.5,
-            bookValue: 1250.0,
-            eps: 86.0,
-            dividendYield: 0.34,
-            debt: 2.1,
-            marketCap: 16500000,
-            volume: 2500000,
-            lastUpdated: new Date(),
-          },
-        },
-        {
-          id: "sensex-infosys",
-          ticker: "INFY",
-          name: "Infosys Ltd",
-          weight: 8.5,
-          shares: 120,
-          currentPrice: 1542.8,
-          totalValue: 185136,
-          notes: [],
-          marketData: {
-            price: 1542.8,
-            change: -12.2,
-            changePercent: -0.78,
-            pe: 28.2,
-            bookValue: 285.6,
-            eps: 54.7,
-            dividendYield: 2.1,
-            debt: 0.05,
-            marketCap: 6350000,
-            volume: 4100000,
-            lastUpdated: new Date(),
-          },
-        },
-      ],
-      totalValue: 381176,
-      totalReturn: 30494.08,
-      totalReturnPercent: 8.0,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      isTemplate: true,
-    };
-
-    this.portfolios.set([nifty50, sensex30]);
-  }
+  // Sample data initialization removed - using database instead
 }

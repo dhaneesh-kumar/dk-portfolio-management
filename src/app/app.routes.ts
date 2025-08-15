@@ -2,6 +2,7 @@ import { Routes } from "@angular/router";
 import { PortfolioListComponent } from "./pages/portfolio-list.component";
 import { PortfolioDetailComponent } from "./pages/portfolio-detail.component";
 import { StockDetailComponent } from "./pages/stock-detail.component";
+import { NotesDemoComponent } from "./pages/notes-demo.component";
 import { LoginComponent } from "./core/components/login.component";
 import { authGuard, guestGuard } from "./guards/auth.guard";
 
@@ -17,6 +18,10 @@ export const routes: Routes = [
     path: "stock/:id",
     component: StockDetailComponent,
     canActivate: [authGuard],
+  },
+  {
+    path: "notes-demo",
+    component: NotesDemoComponent,
   },
   { path: "**", redirectTo: "dashboard" },
 ];
