@@ -1,4 +1,4 @@
-import { Injectable } from "@angular/core";
+import { Injectable, signal } from "@angular/core";
 import { Observable, of, forkJoin } from "rxjs";
 import { catchError, map } from "rxjs/operators";
 import { MarketData } from "../models/portfolio.model";
@@ -31,6 +31,20 @@ export interface StockQuote {
   providedIn: "root",
 })
 export class StockApiService {
+  commonNoteSections = signal( [
+    "Overview",
+    "Management Quality",
+    "Financial Health",
+    "Moat Analysis",
+    "Risk Assessment",
+    "Competitive Advantage",
+    "Growth Prospects",
+    "Why I Bought",
+    "Investing Duration",
+    "Exit Strategy",
+  ]);
+
+
   // Using CORS proxy to avoid browser CORS restrictions
   private readonly CORS_PROXY = "https://api.allorigins.win/raw?url=";
   private readonly YAHOO_FINANCE_API =

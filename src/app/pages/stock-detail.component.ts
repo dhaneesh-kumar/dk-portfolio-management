@@ -237,7 +237,7 @@ import { EnhancedNotesComponent } from "../shared/components/enhanced-notes/enha
                   Quick Add Notes
                 </h3>
                 <div class="space-y-2">
-                  @for (section of commonNoteSections; track section) {
+                  @for (section of commonNoteSections(); track section) {
                     <button
                       (click)="startQuickNote(section)"
                       class="w-full text-left px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-lg transition-colors"
@@ -311,16 +311,7 @@ export class StockDetailComponent {
     return notes;
   });
 
-  commonNoteSections = [
-    "Why I Bought",
-    "Moat Analysis",
-    "Exit Strategy",
-    "Risk Assessment",
-    "Competitive Advantage",
-    "Financial Health",
-    "Growth Prospects",
-    "Management Quality",
-  ];
+  commonNoteSections = this.stockApiService.commonNoteSections;
 
   constructor() {
     this.route.params.subscribe((params) => {

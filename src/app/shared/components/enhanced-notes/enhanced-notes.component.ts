@@ -1,7 +1,8 @@
-import { Component, Input, Output, EventEmitter, signal, computed, OnInit, input, output } from '@angular/core';
+import { Component, Input, Output, EventEmitter, signal, computed, OnInit, input, output, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { QuillModule } from 'ngx-quill';
+import { StockApiService } from '../../../services/stock-api.service';
 
 export interface Note {
   id: string;
@@ -265,28 +266,21 @@ export interface NoteSection {
 })
 export class EnhancedNotesComponent implements OnInit {
   notes = input<Note[]>([]);;
-noteAdded = output<{ section: string; content: string }>();
-noteUpdated = output<{ id: string; section: string; content: string }>();
-noteDeleted = output<string>();
+  noteAdded = output<{ section: string; content: string }>();
+  noteUpdated = output<{ id: string; section: string; content: string }>();
+  noteDeleted = output<string>();
 
   showAddNoteModal = signal(false);
   editingNote = signal<Note | null>(null);
+
+  stockApiService = inject(StockApiService);
 
   noteForm = {
     section: '',
     content: ''
   };
 
-  commonSections = [
-    'Why I Bought',
-    'Moat Analysis', 
-    'Exit Strategy',
-    'Risk Assessment',
-    'Competitive Advantage',
-    'Financial Health',
-    'Growth Prospects',
-    'Management Quality'
-  ];
+  commonSections = this.stockApiService.commonNoteSections();
 
   // Rich text editor configuration
   quillModules = {
