@@ -7,7 +7,7 @@ import {
   AfterViewInit,
 } from "@angular/core";
 import { CommonModule } from "@angular/common";
-import { Stock } from "../models/portfolio.model";
+import { Stock } from "../../models/portfolio.model";
 
 @Component({
   selector: "app-portfolio-chart",

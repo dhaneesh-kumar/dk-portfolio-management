@@ -1,7 +1,7 @@
 import { Component, inject, signal } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { FormsModule } from "@angular/forms";
-import { Router } from "@angular/router";
+import { Router, ActivatedRoute } from "@angular/router";
 
 import { AuthService } from "../../../../core/services/auth.service";
 import { LoadingSpinnerComponent } from "../../../../shared/components/loading-spinner/loading-spinner.component";
@@ -281,6 +281,7 @@ import { LoadingSpinnerComponent } from "../../../../shared/components/loading-s
 export class LoginComponent {
   readonly authService = inject(AuthService);
   private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
 
   activeTab = signal<"signin" | "signup">("signin");
   showForgotPassword = signal(false);
@@ -301,7 +302,7 @@ export class LoginComponent {
   async signIn(): Promise<void> {
     const success = await this.authService.signInWithEmail(
       this.signinData.email,
-      this.signinData.password,
+      this.signinData.password
     );
 
     if (success) {

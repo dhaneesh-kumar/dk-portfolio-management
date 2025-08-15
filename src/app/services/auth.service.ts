@@ -1,4 +1,4 @@
-import { Injectable, signal, OnDestroy } from "@angular/core";
+import { Injectable, signal, OnDestroy, inject } from "@angular/core";
 import {
   getAuth,
   signInWithPopup,
@@ -13,6 +13,7 @@ import {
 } from "firebase/auth";
 import { User } from "../models/portfolio.model";
 import { fromEventPattern, Subscription, ReplaySubject, map } from 'rxjs';
+import { Router } from "@angular/router";
 
 @Injectable({
   providedIn: "root",
@@ -21,6 +22,8 @@ export class AuthService implements OnDestroy {
   user = signal<User | null>(null);
   loading = signal<boolean>(true);
   error = signal<string | null>(null);
+
+  private readonly router = inject(Router)
 
   private auth: any;
   private authSubscription: Subscription | null = null;
@@ -45,8 +48,7 @@ export class AuthService implements OnDestroy {
   }
 
   authStatus$() {
-    // Returns an observable that emits the authentication status only after the initial auth state is resolved
-    return this._authReady.pipe(map(() => this.user() !== null));
+    return this._authReady.asObservable();
   }
 
   private initAuthListener() {
@@ -64,16 +66,9 @@ export class AuthService implements OnDestroy {
       (handler, unsubscribe) => unsubscribe()
     );
 
-    let firstAuthState = true;
     this.authSubscription = authState$.subscribe({
       next: (firebaseUser: FirebaseUser | null) => {
-        if (firstAuthState) {
-          firstAuthState = false;
-        }
-        console.log(
-          "🔄 Auth state changed:",
-          firebaseUser ? firebaseUser.email : "No user",
-        );
+
         if (firebaseUser) {
           const user: User = {
             uid: firebaseUser.uid,
@@ -83,13 +78,17 @@ export class AuthService implements OnDestroy {
             photoURL: firebaseUser.photoURL || undefined,
           };
           this.user.set(user);
+          this._authReady.next(true); // Signal that the initial auth state has been processed
           console.log("✅ User authenticated:", user.email);
+          // this.router.navigate(['/dashboard']); // Redirect to dashboard on successful auth
+          
         } else {
           this.user.set(null);
+          this._authReady.next(false); 
           console.log("📝 No user session found, redirecting to login");
+          // this.router.navigate(['/login']); // Redirect to login if no user session
         }
         this.loading.set(false);
-        this._authReady.next(true); // Signal that the initial auth state has been processed
       },
       error: (error) => {
         console.error("❌ Auth state change error:", error);

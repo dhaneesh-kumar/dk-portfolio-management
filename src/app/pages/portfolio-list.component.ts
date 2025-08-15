@@ -2,9 +2,9 @@ import { CommonModule } from "@angular/common";
 import { Component, inject, signal } from "@angular/core";
 import { FormsModule } from "@angular/forms";
 import { RouterModule } from "@angular/router";
-import { HeaderComponent } from "../components/header.component";
 import { FirebasePortfolioService } from "../services/firebase-portfolio.service";
 import { MarketDataService } from "../services/market-data.service";
+import { HeaderComponent } from "../shared/components/header/header.component";
 
 @Component({
   selector: "app-portfolio-list",

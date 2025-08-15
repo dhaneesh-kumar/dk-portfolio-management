@@ -12,7 +12,7 @@ import { FormsModule } from "@angular/forms";
 import {
   StockApiService,
   StockSearchResult,
-} from "../services/stock-api.service";
+} from "../../services/stock-api.service";
 import { debounceTime, distinctUntilChanged, switchMap } from "rxjs/operators";
 import { Subject } from "rxjs";
 

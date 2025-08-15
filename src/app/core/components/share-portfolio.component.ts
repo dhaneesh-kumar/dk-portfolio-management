@@ -8,8 +8,8 @@ import {
 } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { FormsModule } from "@angular/forms";
-import { FirebasePortfolioService } from "../services/firebase-portfolio.service";
-import { SharePermissions, PortfolioShare } from "../models/portfolio.model";
+import { FirebasePortfolioService } from "../../services/firebase-portfolio.service";
+import { SharePermissions, PortfolioShare } from "../../models/portfolio.model";
 
 @Component({
   selector: "app-share-portfolio",

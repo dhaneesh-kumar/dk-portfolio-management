@@ -8,8 +8,8 @@ import {
   StockSearchResult,
 } from "../services/stock-api.service";
 import { Portfolio, Stock } from "../models/portfolio.model";
-import { PortfolioChartComponent } from "../components/portfolio-chart.component";
-import { StockSearchComponent } from "../components/stock-search.component";
+import { PortfolioChartComponent } from "../core/components/portfolio-chart.component";
+import { StockSearchComponent } from "../core/components/stock-search.component";
 
 @Component({
   selector: "app-portfolio-detail",
@@ -258,6 +258,11 @@ import { StockSearchComponent } from "../components/stock-search.component";
                       <th
                         class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider"
                       >
+                        No
+                      </th>
+                      <th
+                        class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider"
+                      >
                         Stock
                       </th>
                       <th
@@ -293,8 +298,15 @@ import { StockSearchComponent } from "../components/stock-search.component";
                     </tr>
                   </thead>
                   <tbody class="bg-white divide-y divide-slate-200">
-                    @for (stock of portfolio()!.stocks; track stock.id) {
+                    @for (stock of portfolio()!.stocks; track stock.id; let i = $index) {
                       <tr class="hover:bg-slate-50">
+                        <td class="px-6 py-4 whitespace-nowrap">
+                          <div>
+                            <div class="text-sm font-medium text-slate-900">
+                              {{ i+1 }}
+                            </div>
+                          </div>
+                        </td>
                         <td class="px-6 py-4 whitespace-nowrap">
                           <div>
                             <div class="text-sm font-medium text-slate-900">
