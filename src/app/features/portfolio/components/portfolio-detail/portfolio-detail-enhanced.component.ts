@@ -4,7 +4,9 @@ import { CommonModule } from "@angular/common";
 
 import { FirebasePortfolioService } from "../../../../services/firebase-portfolio.service";
 import { PortfolioCalculationService } from "../../services/portfolio-calculation.service";
+import { StockApiService } from "../../../../services/stock-api.service";
 import { Portfolio, Stock, BatchPriceUpdateDto, AddDividendDto, UpdatePortfolioBudgetDto, UpdatePortfolioDto } from "../../models/portfolio.model";
+import { forkJoin } from "rxjs";
 
 // Import new components
 import { BatchPriceUpdateComponent } from "../batch-price-update/batch-price-update.component";
@@ -79,6 +81,24 @@ import { PortfolioEditFormComponent } from "../portfolio-edit-form/portfolio-edi
                   Update Prices
                 </button>
                 <button
+                  (click)="refreshStockPrices()"
+                  [disabled]="isRefreshingPrices()"
+                  class="bg-purple-600 hover:bg-purple-700 disabled:bg-purple-400 text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center"
+                >
+                  @if (isRefreshingPrices()) {
+                    <svg class="w-5 h-5 mr-2 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none" opacity="0.25" />
+                      <path fill="currentColor" d="M4 12a8 8 0 018-8v2a6 6 0 00-6 6h2z" opacity="0.75" />
+                    </svg>
+                    Refreshing...
+                  } @else {
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                    🤖 Refresh Prices
+                  }
+                </button>
+                <button
                   (click)="rebalancePortfolio()"
                   class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
                 >
@@ -99,6 +119,39 @@ import { PortfolioEditFormComponent } from "../portfolio-edit-form/portfolio-edi
             </div>
           </div>
         </header>
+
+        <!-- Refresh Status Messages -->
+        @if (refreshMessage()) {
+          <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
+            <div 
+              class="px-4 py-3 rounded-lg border"
+              [class]="refreshMessage()!.type === 'success' ? 'bg-green-50 border-green-200 text-green-800' : 'bg-red-50 border-red-200 text-red-800'"
+            >
+              <div class="flex items-center">
+                <svg 
+                  class="w-5 h-5 mr-2"
+                  [class]="refreshMessage()!.type === 'success' ? 'text-green-400' : 'text-red-400'"
+                  fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                >
+                  @if (refreshMessage()!.type === 'success') {
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  } @else {
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  }
+                </svg>
+                <span class="text-sm font-medium">{{ refreshMessage()!.text }}</span>
+                <button
+                  (click)="refreshMessage.set(null)"
+                  class="ml-auto text-slate-400 hover:text-slate-600"
+                >
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        }
 
         <!-- Enhanced Portfolio Stats -->
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -248,7 +301,7 @@ import { PortfolioEditFormComponent } from "../portfolio-edit-form/portfolio-edi
                             <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Quantity</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Allocation</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Value</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Status</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Last Updated</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Actions</th>
                           </tr>
                         </thead>
@@ -283,9 +336,12 @@ import { PortfolioEditFormComponent } from "../portfolio-edit-form/portfolio-edi
                                 ₹{{ stock.totalValue | number: "1.0-0" }}
                               </td>
                               <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                  Active
-                                </span>
+                                <div class="text-sm text-slate-900">
+                                  {{ getLastUpdatedDisplay(stock.updatedAt || stock.createdAt) }}
+                                </div>
+                                <div class="text-xs text-slate-500">
+                                  {{ stock.marketData?.lastUpdated ? ('Market: ' + getTimeAgo(stock.marketData!.lastUpdated!)) : 'No market data' }}
+                                </div>
                               </td>
                               <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                 <div class="flex gap-2">
@@ -395,12 +451,15 @@ export class PortfolioDetailEnhancedComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly portfolioService = inject(FirebasePortfolioService);
   private readonly calculationService = inject(PortfolioCalculationService);
+  private readonly stockApiService = inject(StockApiService);
 
   portfolio = signal<Portfolio | null>(null);
   activeTab = signal<'holdings' | 'cash' | 'dividends' | 'history'>('holdings');
   selectedStockForHistory = signal<any>(null);
   showBatchPriceUpdate = signal(false);
   showEditForm = signal(false);
+  isRefreshingPrices = signal(false);
+  refreshMessage = signal<{type: 'success' | 'error', text: string} | null>(null);
 
   portfolioStocks = computed(() => {
     const p = this.portfolio();
@@ -494,6 +553,112 @@ export class PortfolioDetailEnhancedComponent implements OnInit {
     // Implement rebalancing logic
   }
 
+  refreshStockPrices(): void {
+    const currentPortfolio = this.portfolio();
+    if (!currentPortfolio || this.isRefreshingPrices()) {
+      return;
+    }
+
+    console.log('🤖 Refreshing stock prices with Gemini AI...');
+    this.isRefreshingPrices.set(true);
+
+    // Get all non-cash stocks
+    const stocksToUpdate = currentPortfolio.stocks.filter(stock => !stock.isCashStock);
+    
+    if (stocksToUpdate.length === 0) {
+      console.log('No stocks to update');
+      this.isRefreshingPrices.set(false);
+      return;
+    }
+
+    // Create parallel requests for all stocks
+    const priceRequests = stocksToUpdate.map(stock => 
+      this.stockApiService.getStockQuote(stock.ticker)
+    );
+
+    forkJoin(priceRequests).subscribe({
+      next: (stockQuotes) => {
+        console.log('Successfully fetched price updates for', stockQuotes.length, 'stocks');
+        
+        // Update the portfolio stocks with new prices
+        const updatedPortfolio = { ...currentPortfolio };
+        updatedPortfolio.stocks = updatedPortfolio.stocks.map(stock => {
+          if (stock.isCashStock) {
+            return stock; // Don't update cash stocks
+          }
+
+          const stockQuote = stockQuotes.find(quote => quote?.symbol === stock.ticker.toUpperCase());
+          if (stockQuote) {
+            console.log(`Updating ${stock.ticker}: ₹${stock.currentPrice} → ₹${stockQuote.price}`);
+            
+            return {
+              ...stock,
+              currentPrice: stockQuote.price,
+              totalValue: (stock.quantity || stock.shares) * stockQuote.price,
+              // Update market data if available
+              marketData: stockQuote ? {
+                price: stockQuote.price,
+                change: stockQuote.change,
+                changePercent: stockQuote.changePercent,
+                pe: stockQuote.pe || 0,
+                bookValue: stockQuote.bookValue || 0,
+                eps: stockQuote.eps || 0,
+                dividendYield: stockQuote.dividendYield || 0,
+                debt: stockQuote.debt || 0,
+                marketCap: stockQuote.marketCap || 0,
+                volume: stockQuote.volume || 0,
+                lastUpdated: new Date(),
+              } : stock.marketData,
+              updatedAt: new Date(),
+            };
+          }
+          return stock;
+        });
+
+        // Recalculate portfolio totals
+        updatedPortfolio.totalValue = updatedPortfolio.stocks.reduce((sum, stock) => sum + stock.totalValue, 0);
+        updatedPortfolio.updatedAt = new Date();
+
+        // Update the portfolio signal
+        this.portfolio.set(updatedPortfolio);
+        this.portfolioStocksSignal.set(updatedPortfolio.stocks as any);
+
+        console.log('✅ Portfolio prices updated successfully!');
+        this.isRefreshingPrices.set(false);
+
+        // Show success message
+        this.showSuccessMessage('Stock prices updated successfully with latest market data!');
+      },
+      error: (error) => {
+        console.error('❌ Error refreshing stock prices:', error);
+        this.isRefreshingPrices.set(false);
+        this.showErrorMessage('Failed to refresh stock prices. Please try again.');
+      }
+    });
+  }
+
+  private showSuccessMessage(message: string): void {
+    this.refreshMessage.set({ type: 'success', text: message });
+    // Auto-hide success messages after 5 seconds
+    setTimeout(() => {
+      if (this.refreshMessage()?.type === 'success') {
+        this.refreshMessage.set(null);
+      }
+    }, 5000);
+    console.log('✅ Success:', message);
+  }
+
+  private showErrorMessage(message: string): void {
+    this.refreshMessage.set({ type: 'error', text: message });
+    // Auto-hide error messages after 8 seconds  
+    setTimeout(() => {
+      if (this.refreshMessage()?.type === 'error') {
+        this.refreshMessage.set(null);
+      }
+    }, 8000);
+    console.error('❌ Error:', message);
+  }
+
   formatPortfolioType(type: string): string {
     const types: Record<string, string> = {
       equity: 'Equity',
@@ -513,6 +678,32 @@ export class PortfolioDetailEnhancedComponent implements OnInit {
       very_aggressive: 'Very Aggressive'
     };
     return levels[riskLevel] || riskLevel;
+  }
+
+  getLastUpdatedDisplay(date: Date | undefined): string {
+    if (!date) return 'Never';
+    return this.getTimeAgo(date);
+  }
+
+  getTimeAgo(date: Date): string {
+    const now = new Date();
+    const diffMs = now.getTime() - new Date(date).getTime();
+    const diffSeconds = Math.floor(diffMs / 1000);
+    const diffMinutes = Math.floor(diffSeconds / 60);
+    const diffHours = Math.floor(diffMinutes / 60);
+    const diffDays = Math.floor(diffHours / 24);
+
+    if (diffSeconds < 60) {
+      return 'Just now';
+    } else if (diffMinutes < 60) {
+      return `${diffMinutes}m ago`;
+    } else if (diffHours < 24) {
+      return `${diffHours}h ago`;
+    } else if (diffDays < 7) {
+      return `${diffDays}d ago`;
+    } else {
+      return new Date(date).toLocaleDateString();
+    }
   }
 
   goBack(): void {

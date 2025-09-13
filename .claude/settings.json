@@ -1,0 +1,38 @@
+{
+  "statusLine": {
+    "left": [
+      {
+        "type": "text",
+        "value": "📁 "
+      },
+      {
+        "type": "cwd",
+        "maxLength": 30
+      }
+    ],
+    "right": [
+      {
+        "type": "git_branch",
+        "prefix": "🌿 "
+      },
+      {
+        "type": "text",
+        "value": " • "
+      },
+      {
+        "type": "git_last_commit_time_ago",
+        "format": "relative"
+      },
+      {
+        "type": "text",
+        "value": " • "
+      },
+      {
+        "type": "git_push_pull_status",
+        "ahead_symbol": "↑",
+        "behind_symbol": "↓",
+        "up_to_date_symbol": "✓"
+      }
+    ]
+  }
+}

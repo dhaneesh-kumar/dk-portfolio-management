@@ -1,7 +1,8 @@
-import { Injectable, signal } from "@angular/core";
+import { Injectable, signal, inject } from "@angular/core";
 import { Observable, of, forkJoin } from "rxjs";
 import { catchError, map } from "rxjs/operators";
 import { MarketData } from "../models/portfolio.model";
+import { GeminiStockService, GeminiStockData } from "./gemini-stock.service";
 
 export interface StockSearchResult {
   symbol: string;
@@ -25,12 +26,27 @@ export interface StockQuote {
   dividendYield?: number;
   debt?: number;
   lastUpdated: Date;
+  // Enhanced fields from Gemini
+  fundamentals?: {
+    debtToEquity?: number;
+    roe?: number;
+    revenue?: number;
+    netIncome?: number;
+  };
+  analysis?: {
+    summary: string;
+    strengths: string[];
+    risks: string[];
+    recommendation: 'BUY' | 'HOLD' | 'SELL' | 'UNKNOWN';
+  };
 }
 
 @Injectable({
   providedIn: "root",
 })
 export class StockApiService {
+  private readonly geminiStockService = inject(GeminiStockService);
+
   commonNoteSections = signal( [
     "Overview",
     "Management Quality",
@@ -125,51 +141,18 @@ export class StockApiService {
   }
 
   /**
-   * Get real-time stock quote and market data
+   * Get real-time stock quote and market data using Gemini AI
    */
   getStockQuote(symbol: string): Observable<StockQuote | null> {
-    // Always return fallback quote to avoid CORS issues
-    // In a production app, this would call your backend API
-    return of(this.getFallbackQuote(symbol));
-
-    // Commented out API call due to CORS restrictions
-    // In production, implement this through your backend server
-    /*
-    const formattedSymbol = this.formatIndianSymbol(symbol);
-    const proxyUrl = `${this.CORS_PROXY}${encodeURIComponent(this.YAHOO_FINANCE_API)}/${formattedSymbol}`;
-
-    return this.makeHttpRequest<any>(proxyUrl).pipe(
-      map((response) => {
-        if (response && response.chart && response.chart.result && response.chart.result[0]) {
-          const result = response.chart.result[0];
-          const meta = result.meta;
-
-          if (meta) {
-            return {
-              symbol: symbol.toUpperCase(),
-              name: meta.longName || meta.shortName || symbol,
-              price: meta.regularMarketPrice || meta.previousClose || 0,
-              change: (meta.regularMarketPrice || 0) - (meta.previousClose || 0),
-              changePercent: ((meta.regularMarketPrice || 0) - (meta.previousClose || 0)) / (meta.previousClose || 1) * 100,
-              marketCap: meta.marketCap,
-              volume: meta.regularMarketVolume,
-              pe: meta.trailingPE,
-              eps: meta.epsTrailingTwelveMonths,
-              bookValue: meta.bookValue,
-              dividendYield: meta.dividendYield ? meta.dividendYield * 100 : undefined,
-              debt: meta.totalDebt,
-              lastUpdated: new Date(),
-            };
-          }
-        }
-        return this.getFallbackQuote(symbol);
-      }),
+    console.log(`🤖 Fetching stock data for ${symbol} using Gemini AI...`);
+    
+    return this.geminiStockService.getStockData(symbol).pipe(
+      map((geminiData: GeminiStockData) => this.convertGeminiToStockQuote(geminiData)),
       catchError((error) => {
-        console.warn("API quote failed, using fallback data:", error.message);
+        console.warn("Gemini stock data failed, using fallback:", error.message);
         return of(this.getFallbackQuote(symbol));
-      }),
+      })
     );
-    */
   }
 
   /**
@@ -178,6 +161,35 @@ export class StockApiService {
   getMultipleQuotes(symbols: string[]): Observable<(StockQuote | null)[]> {
     const requests = symbols.map((symbol) => this.getStockQuote(symbol));
     return forkJoin(requests);
+  }
+
+  /**
+   * Convert Gemini stock data to StockQuote interface
+   */
+  private convertGeminiToStockQuote(geminiData: GeminiStockData): StockQuote {
+    return {
+      symbol: geminiData.symbol,
+      name: geminiData.name,
+      price: geminiData.currentPrice,
+      change: geminiData.change,
+      changePercent: geminiData.changePercent,
+      marketCap: geminiData.fundamentals.marketCap,
+      volume: 0, // Not provided by Gemini in this implementation
+      pe: geminiData.fundamentals.peRatio,
+      eps: geminiData.fundamentals.eps,
+      bookValue: geminiData.fundamentals.bookValue,
+      dividendYield: geminiData.fundamentals.dividendYield,
+      debt: geminiData.fundamentals.debtToEquity,
+      lastUpdated: geminiData.lastUpdated,
+      // Enhanced Gemini data
+      fundamentals: {
+        debtToEquity: geminiData.fundamentals.debtToEquity,
+        roe: geminiData.fundamentals.roe,
+        revenue: geminiData.fundamentals.revenue,
+        netIncome: geminiData.fundamentals.netIncome,
+      },
+      analysis: geminiData.analysis,
+    };
   }
 
   /**

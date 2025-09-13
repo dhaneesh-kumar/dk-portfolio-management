@@ -1,5 +1,18 @@
 # Netlify configuration for Angular Portfolio Management App
 
+[build]
+  command = "ng build --prod"
+  publish = "dist/fusion-angular-tailwind-starter"
+
+[context.production.environment]
+  NG_APP_FIREBASE_API_KEY = "YOUR_API_KEY"
+  NG_APP_FIREBASE_AUTH_DOMAIN = "YOUR_AUTH_DOMAIN"
+  NG_APP_FIREBASE_PROJECT_ID = "YOUR_PROJECT_ID"
+  NG_APP_FIREBASE_STORAGE_BUCKET = "YOUR_STORAGE_BUCKET"
+  NG_APP_FIREBASE_MESSAGING_SENDER_ID = "YOUR_MESSAGING_SENDER_ID"
+  NG_APP_FIREBASE_APP_ID = "YOUR_APP_ID"
+  NG_APP_FIREBASE_MEASUREMENT_ID = "YOUR_MEASUREMENT_ID"
+
 # Redirect rules for Angular SPA routing
 [[redirects]]
   from = "/*"
