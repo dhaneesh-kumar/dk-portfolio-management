@@ -1,16 +1,18 @@
 import { Component, inject, signal, computed, effect } from "@angular/core";
 import { CommonModule } from "@angular/common";
-import { RouterModule, ActivatedRoute } from "@angular/router";
+import { RouterModule, ActivatedRoute, Router } from "@angular/router";
 import { FormsModule } from "@angular/forms";
 import { FirebasePortfolioService } from "../services/firebase-portfolio.service";
 import { StockApiService } from "../services/stock-api.service";
 import { Stock, StockNote } from "../models/portfolio.model";
 import { EnhancedNotesComponent } from "../shared/components/enhanced-notes/enhanced-notes.component";
+import { StockComparisonSelectorComponent } from "../features/stock-comparison/components/stock-comparison-selector/stock-comparison-selector.component";
+import { ComparedStock } from "../features/stock-comparison/models/stock-comparison.model";
 
 @Component({
   selector: "app-stock-detail",
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, EnhancedNotesComponent],
+  imports: [CommonModule, RouterModule, FormsModule, EnhancedNotesComponent, StockComparisonSelectorComponent],
   template: `
     @if (stock() && portfolio()) {
       <div class="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
@@ -46,9 +48,36 @@ import { EnhancedNotesComponent } from "../shared/components/enhanced-notes/enha
           </div>
         </header>
 
+        <!-- Tab Navigation -->
+        <div class="bg-white border-b border-slate-200">
+          <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <nav class="flex space-x-8" aria-label="Tabs">
+              <button
+                (click)="activeTab.set('overview')"
+                [class]="activeTab() === 'overview' ? 'border-blue-500 text-blue-600' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'"
+                class="border-b-2 py-4 px-1 text-sm font-medium transition-colors"
+              >
+                Overview
+              </button>
+              <button
+                (click)="activeTab.set('compare')"
+                [class]="activeTab() === 'compare' ? 'border-blue-500 text-blue-600' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'"
+                class="border-b-2 py-4 px-1 text-sm font-medium transition-colors flex items-center gap-2"
+              >
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                </svg>
+                Compare
+              </button>
+            </nav>
+          </div>
+        </div>
+
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <!-- Market Data Column -->
+          <!-- Overview Tab -->
+          @if (activeTab() === 'overview') {
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              <!-- Market Data Column -->
             <div class="lg:col-span-2 space-y-6">
               <!-- Price Overview -->
               <div
@@ -249,6 +278,19 @@ import { EnhancedNotesComponent } from "../shared/components/enhanced-notes/enha
               </div>
             </div>
           </div>
+          }
+
+          <!-- Compare Tab -->
+          @if (activeTab() === 'compare') {
+            <div>
+              <app-stock-comparison-selector
+                [minStocks]="2"
+                [maxStocks]="5"
+                [preSelectedStocks]="currentStockAsComparedStock()"
+                (compare)="onCompareStocks($event)"
+              />
+            </div>
+          }
         </div>
 
 
@@ -269,12 +311,14 @@ import { EnhancedNotesComponent } from "../shared/components/enhanced-notes/enha
 })
 export class StockDetailComponent {
   private route = inject(ActivatedRoute);
+  private router = inject(Router);
   private portfolioService = inject(FirebasePortfolioService);
   private stockApiService = inject(StockApiService);
 
   stockId = signal<string>("");
   portfolioId = signal<string>("");
   refreshTrigger = signal<number>(0);
+  activeTab = signal<'overview' | 'compare'>('overview');
 
   portfolio = computed(() => {
     const pId = this.portfolioId();
@@ -312,6 +356,32 @@ export class StockDetailComponent {
   });
 
   commonNoteSections = this.stockApiService.commonNoteSections;
+
+  // Prepare current stock for comparison
+  currentStockAsComparedStock = computed(() => {
+    const currentStock = this.stock();
+    if (!currentStock || !currentStock.marketData) return [];
+
+    const comparedStock: ComparedStock = {
+      ticker: currentStock.ticker,
+      name: currentStock.name,
+      currentPrice: currentStock.marketData.price,
+      marketData: {
+        price: currentStock.marketData.price,
+        change: currentStock.marketData.change || 0,
+        changePercent: currentStock.marketData.changePercent || 0,
+        marketCap: currentStock.marketData.marketCap,
+        pe: currentStock.marketData.pe,
+        eps: currentStock.marketData.eps,
+        dividendYield: currentStock.marketData.dividendYield,
+        debtToEquity: currentStock.marketData.debt,
+        roe: currentStock.marketData.roe,
+        bookValue: currentStock.marketData.bookValue,
+      },
+    };
+
+    return [comparedStock];
+  });
 
   constructor() {
     this.route.params.subscribe((params) => {
@@ -464,5 +534,13 @@ export class StockDetailComponent {
 
   async refreshMarketData(): Promise<void> {
     await this.fetchMarketData();
+  }
+
+  onCompareStocks(stocks: ComparedStock[]): void {
+    // When user clicks "Compare" in the selector, navigate to comparison page
+    // The comparison page will handle the actual comparison
+    this.router.navigate(['/stock-comparison'], {
+      state: { preSelectedStocks: stocks }
+    });
   }
 }
